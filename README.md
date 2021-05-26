@@ -1,5 +1,5 @@
 
-![ OLED ](https://github.com/gavinlyonsrepo/SSD1306_OLED_RPI/blob/main/extras/image/oled.jpg)
+![ OLED ](https://github.com/gavinlyonsrepo/SSD1306_OLED_RPI/blob/main/extras/image/device.jpg)
 
 Table of contents
 ---------------------------
@@ -58,7 +58,7 @@ Hardware
 Connections as per manufacturers diagram, I2C bus pull-up resistors are on module.
 If 3.3V regulator on back of module can be powered from 5V PSU.
 
-![ wiring ](https://github.com/gavinlyonsrepo/SSD1306_OLED_RPI/blob/main/extras/image/wiring.png)
+![ wiring ](https://github.com/gavinlyonsrepo/SSD1306_OLED_RPI/blob/main/extras/image/wiring.jpg)
 
 Features
 -------------------------
