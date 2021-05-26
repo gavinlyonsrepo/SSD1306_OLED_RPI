@@ -5,8 +5,8 @@
 //  
 // NO LOWERCASE LETTERS
 
-#ifndef font_two_H
-#define font_two_H
+#ifndef _font_two_H
+#define _font_two_H
 
 static const char Font_Two[] = {
 	0x00,0x00,0x00,0x00,0x00,0x00,0x00, //  

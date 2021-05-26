@@ -1,11 +1,9 @@
 // ASCII font file : "Seven Segment" 4 by 8 
 // Define the ASCII table as Data array
-// cols left to right 0x00 is  off 0xFF is all on
-// Each character is four bits wide one byte height. 
-// so ! is 0x36 0 0  0 0 
+// cols left to right ,0x00 is  off 0xFF is all on
 
-#ifndef font_three_H
-#define font_three_H
+#ifndef _font_three_H
+#define _font_three_H
 
 static const  char Font_Three[] = {
 	0x00,0x00,0x00,0x00, //  

@@ -54,11 +54,11 @@ int8_t setup()
 		printf("Error 1201 Cannot init bcm2835 library\n");
 		return -1;
 	}
-	bcm2835_delay(500);
+	bcm2835_delay(50);
 	printf("OLED Begin\r\n");
 	myOLED.OLEDbegin(); // initialize the OLED
 	myOLED.OLEDFillScreen(0x01, 0); //splash screen
-	bcm2835_delay(2500);
+	bcm2835_delay(1500);
 	return 1;
 }
 
@@ -84,7 +84,7 @@ void Test1(void)
 void Test2(void)
 {
 	myOLED.OLEDBitmap(30, 10, 20, 20, smallImage, true);
-	myOLED.OLEDBitmap(70, 10, 16, 8,  Signal816, false);
+	myOLED.OLEDBitmap(70, 10, 16, 8,  SignalIcon, false);
 	myOLED.OLEDupdate();
 	
 	bcm2835_delay(5000);
@@ -92,7 +92,6 @@ void Test2(void)
 	myOLED.OLEDclearBuffer();
 
 }
-
 
 void Test3(void)
 {

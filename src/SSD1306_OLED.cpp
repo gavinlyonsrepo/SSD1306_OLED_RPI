@@ -1,15 +1,11 @@
 /*
 * Project Name: SSD1306_OLED_RPI
-* File: SSD1306.h
-* Description:
 * Author: Gavin Lyons.
 * URL: https://github.com/gavinlyonsrepo/SSD1306_OLED_RPI
 */
 
-
 #include "SSD1306_OLED.h"
 #include <stdbool.h>
-
 
 SSD1306  :: SSD1306(int16_t oledwidth, int16_t oledheight) :SSD1306_graphics(oledwidth, oledheight)
 {
@@ -20,16 +16,13 @@ SSD1306  :: SSD1306(int16_t oledwidth, int16_t oledheight) :SSD1306_graphics(ole
 	bufferHeight = _OLED_HEIGHT;
 }
 
-
 // Desc: begin Method initialise OLED
-// Sets pinmodes and SPI setup
 void SSD1306::OLEDbegin()
 {
 	OLED_I2C_ON();
 	OLEDinit();
 	OLED_I2C_OFF();
 }
-
 
 void SSD1306::OLED_I2C_ON()
 {
@@ -65,9 +58,7 @@ void SSD1306::OLEDPowerDown(void)
 	bcm2835_delay(100);
 }
 
-
 // Desc: Called from OLEDbegin carries out Power on sequence and register init
-// Can be used to reset OLED to default values.
 void SSD1306::OLEDinit()
  {
 
@@ -121,7 +112,6 @@ switch (_OLED_HEIGHT)
 
 	bcm2835_delay(SSD1306_INITDELAY);
 }
-
 
 // Desc: Turns On Display
 // Param1: bits,  1  on , 0 off
@@ -196,6 +186,8 @@ void SSD1306::OLEDFillPage(uint8_t page_num, uint8_t dataPattern,uint8_t mydelay
 //Param2: y offset 0-64
 //Param3: width 0-128
 //Param4 height 0-64
+//Param5: pointer to bitmap data
+//Param6: Invert color 
 void SSD1306::OLEDBitmap(int16_t x, int16_t y, int16_t w, int16_t h, const uint8_t* data, bool invert)
 {
 
@@ -227,6 +219,8 @@ for (int16_t j = 0; j < h; j++, y++)
 
 }
 
+// Desc Writes a byte to I2C address,command or reg
+// used internally
 void SSD1306::I2C_Write_Byte(uint8_t value, uint8_t Cmd)
 {
 	char buf[2] = {Cmd,value};
@@ -246,7 +240,7 @@ void SSD1306::OLEDupdate()
 	OLEDBuffer( x,  y,  w,  h, (uint8_t*) this->buffer);
 }
 
-//Desc: clears the buffer i.e. does NOT write to the screen
+//Desc: clears the buffer memory i.e. does NOT write to the screen
 void SSD1306::OLEDclearBuffer()
 {
 
@@ -259,7 +253,7 @@ void SSD1306::OLEDclearBuffer()
 //Param2: y offset 0-64
 //Param3: width 0-128
 //Param4 height 0-64
-//Param5 the bitmap
+//Param5 the buffer data
 //Note: Called by OLEDupdate
 void SSD1306::OLEDBuffer(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t* data)
 {
@@ -296,7 +290,7 @@ void SSD1306::OLEDBuffer(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t* da
 
 }
 
-// Desc: Draws a Pixel to the screen overides the  graphics library
+// Desc: Draws a Pixel to the screen overides the gfx lib if defined
 // Passed x and y co-ords and colour of pixel.
 void SSD1306::drawPixel(int16_t x, int16_t y, uint16_t colour)
 {
@@ -329,6 +323,7 @@ void SSD1306::drawPixel(int16_t x, int16_t y, uint16_t colour)
 			case INVERSE: this->buffer[tc] ^= (1 << (y & 7)); break;
 		}
 }
+
 
 void SSD1306::OLED_StartScrollRight(uint8_t start, uint8_t stop) 
 {
@@ -389,7 +384,6 @@ void SSD1306::OLED_StartScrollDiagLeft(uint8_t start, uint8_t stop)
 	SSD1306_command(SSD1306_ACTIVATE_SCROLL);
 	OLED_I2C_OFF();
 }
-
 
 void SSD1306::OLED_StopScroll(void) 
 {

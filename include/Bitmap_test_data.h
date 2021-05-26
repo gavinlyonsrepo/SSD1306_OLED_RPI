@@ -1,6 +1,5 @@
 /*
 * Project Name: SSD1306_OLED_RPI
-* File: SSD1306.h
 * Description: Data file to hold bitmap test data, all horizontally addressed.
 * SW used to make code https://javl.github.io/image2cpp/ 
 * Author: Gavin Lyons.
@@ -78,8 +77,6 @@ const uint8_t AlarmIcon[8] =
 {
     0xC3,0xBD,0x42,0x52,0x4E,0x42,0x3C,0xC3
 };
-
-
 
 // HORIZONTAL addressing
 // 'backupicon', 128x64px

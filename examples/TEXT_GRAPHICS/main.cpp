@@ -3,10 +3,6 @@
 // Test file for SSD1306_OLED_RPI library, showing use of TEXT mode & graphics.
 // URL: https://github.com/gavinlyonsrepo/SSD1306_OLED_RPI
 // *****************************
-// NOTES :
-// (1) In the <SSD1306_OLED.h> USER BUFFER OPTION SECTION, at top of file
-// option MULTI_BUFFER must be selected and only this option.
-// ******************************
 
 #include <bcm2835.h>
 #include "SSD1306_OLED.h"
@@ -83,10 +79,10 @@ void TestLoop()
 // Test 4 draw a single character font size 4
 // Test 5 print ASCII  font 0-127
 // Test 6 print ASCII font 128-255
-// Test 7 thick font 2
+// Test 7 thick font 2 (NO LOWERCASE)
 // Test 8 seven seg font 3
-// Test 9 wide font
-
+// Test 9 wide font (NO LOWERCASE)
+// Test 10 bigNums font (NUMS ONLY + . : space)
 void DisplayText()
 {
 
@@ -209,6 +205,7 @@ void DisplayText()
 	
 	//Test 10
 	myOLED.setFontNum(5);
+	// Mote '/' gives a space in BigNums font #5
 	char myString[9] = {'1','/','3','2',':','6','.','8'};
 	myOLED.drawChar(0, 0, '8', WHITE, BLACK,1);
 	myOLED.drawTextBigNum(0, 32, myString , BLACK, WHITE);

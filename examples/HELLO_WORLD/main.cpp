@@ -1,14 +1,10 @@
 
 // Example file name : main.cpp
 // Description:
-// Test file for SSD1306_OLED library, showing use of hello world
+// Test file for SSD1306_OLED library, showing  hello world
 // URL: https://github.com/gavinlyonsrepo/SSD1306_OLED_RPI
 // *****************************
-// NOTES :
-// (1) In the <SSD1306_OLED.h> USER BUFFER OPTION SECTION, at top of file
-// option MULTI_BUFFER must be selected
-// and only this option. It is on by default.
-// ******************************
+
 
 #include <bcm2835.h>
 #include "SSD1306_OLED.h"
@@ -49,7 +45,7 @@ void SetupTest()
 	printf("OLED Begin\r\n");
 	myOLED.OLEDbegin(); // initialize the OLED
 	myOLED.OLEDFillScreen(0xF0, 0); // splash screen bars
-	bcm2835_delay(2000);
+	bcm2835_delay(1500);
 }
 
 void EndTest()

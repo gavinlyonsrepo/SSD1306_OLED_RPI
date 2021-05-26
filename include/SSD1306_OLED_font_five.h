@@ -1,9 +1,9 @@
-// ASCII font file : Wide font 16 by 32 , xbyy
+// ASCII font file : bignum font 5 16 by 32 , 
 // Define the ASCII table as Data array
-// NUMBERS + ":" ONLY 
+// NUMBERS + ": . " ONLY  / is space
 
-#ifndef font_five_H
-#define font_five_H
+#ifndef _font_five_H
+#define _font_five_H
 
 // 32 * 16/8 = 64 ,;;, 64 * 11 = 704 bytes
 // 32 height 16 width

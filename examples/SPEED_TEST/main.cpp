@@ -1,23 +1,16 @@
 
 // Example file name : main.cpp
 // Description:
-// Test file for SSD1306_OLED library, showing use of mulitple buffers.  
-// In this case: two, divided horizontally.
-// The user can also divide vertically. and create as many buffers as they want.
+// Test file for SSD1306_OLED library, showing fps
 // URL: https://github.com/gavinlyonsrepo/SSD1306_OLED_RPI
-// *****************************
-// NOTES :
-// (1) In the <SSD1306_OLED.h> USER BUFFER OPTION SECTION, at top of file
-// option MULTI_BUFFER must be selected
-// and only this option. It is on by default.
-// (2) measured frame rate 279 fps
-// ******************************
-// 
+// Fps 7 bcm2835_i2c_set_baudrate(100000);
+// Fps 16 bcm2835_i2c_setClockDivider(BCM2835_I2C_CLOCK_DIVIDER_626);
+// FPS 25 bcm2835_i2c_setClockDivider(BCM2835_I2C_CLOCK_DIVIDER_148);
 
-#include <bcm2835.h>
-#include "SSD1306_OLED.h"
 #include <time.h>
 #include <stdio.h>
+#include <bcm2835.h>
+#include "SSD1306_OLED.h"
 
 #define myOLEDwidth  128
 #define myOLEDheight 64
@@ -28,6 +21,7 @@ SSD1306 myOLED(myOLEDwidth ,myOLEDheight) ; // instantiate  an object
 uint16_t count  = 0;
 bool colour = 1;
 uint64_t  previousCounter =0;
+uint8_t  screenBuffer[myOLEDwidth * (myOLEDheight / 8) ]; 
 
 // =============== Function prototype ================
 uint8_t  setup(void);
@@ -36,6 +30,7 @@ void display_buffer(long , int );
 void EndTests(void);
 static uint64_t counter( void );
 
+	
 // ======================= Main ===================
 int main(int argc, char **argv)
 {
@@ -64,43 +59,31 @@ uint8_t setup()
 		printf("Error 1201 Cannot init bcm2835 library\n");
 		return -1;
 	}
-	bcm2835_delay(500);
+	bcm2835_delay(50);
 	printf("OLED Begin\r\n");
 	myOLED.OLEDbegin(); // initialize the OLED
 	myOLED.OLEDFillScreen(0x01, 0); //splash screen bars
-	bcm2835_delay(2500);
+	bcm2835_delay(1500);
 	myOLED.setTextColor(WHITE);
 	myOLED.setTextSize(1);
+	myOLED.buffer = (uint8_t*) &screenBuffer;  
 	return 1;
 }
 
 void myLoop() {
-	
-	uint8_t  screenBuffer[myOLEDwidth * (myOLEDheight / 8) ]; 
-	myOLED.buffer = (uint8_t*) &screenBuffer;  
-	while (count < 1000)
-	{
-		static long framerate = 0;
-		display_buffer(framerate, count);
-		framerate++;
-		count++;
-	}
+
+		while (count < 1000)
+		{
+			static long framerate = 0;
+			display_buffer(framerate, count);
+			framerate++;
+			count++;
+		}
 
 }
 
-
-// Function to display left hand side buffer
 void display_buffer(long currentFramerate, int count)
 {
-	myOLED.OLEDclearBuffer();
-	myOLED.setCursor(0, 0);
-	myOLED.print("SSD1306");
-
-	myOLED.setCursor(0, 20);
-	myOLED.print("G Lyons");
-
-	myOLED.setCursor(0, 30);
-	myOLED.print(count);
 	// Values to count frame rate per second
 	static long lastFramerate = 0;
 	static uint16_t fps;
@@ -113,6 +96,16 @@ void display_buffer(long currentFramerate, int count)
 		previousCounter = currentCounter;
 		colour = !colour;
 	}
+	
+	myOLED.OLEDclearBuffer();
+	myOLED.setCursor(0, 0);
+	myOLED.print("SSD1306");
+
+	myOLED.setCursor(0, 20);
+	myOLED.print("G Lyons");
+
+	myOLED.setCursor(0, 30);
+	myOLED.print(count);
 
 	myOLED.setCursor(0, 40);
 	myOLED.print(fps);
@@ -128,9 +121,9 @@ void display_buffer(long currentFramerate, int count)
 	myOLED.OLEDupdate();
 }
 
-//This returns nano-seconds as a 64-bit unsigned number, monotonically increasing, 
-//probably since system boot.
-//The actual resolution looks like microseconds. returns nanoseconds
+// This func returns nano-seconds as a 64-bit unsigned number, 
+// monotonically increasing, probably since system boot.
+// The actual resolution looks like microseconds. returns nanoseconds
 static uint64_t counter( void )
 {
   struct timespec now;

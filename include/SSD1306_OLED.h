@@ -1,7 +1,5 @@
 /*
 * Project Name: SSD1306_OLED_RPI
-* File: SSD1306.h
-* Description: 
 * Author: Gavin Lyons.
 * URL: https://github.com/gavinlyonsrepo/SSD1306_OLED_RPI
 */
@@ -19,9 +17,7 @@
 #include "SSD1306_OLED_graphics.h"
 
 // ********* DEFINES ********
-
-
-// ***********  SSD1306 Command Set   ***********
+// ***********  SSD1306 Command Set  ***********
 
 // Fundamental Commands
 #define SSD1306_SET_CONTRAST_CONTROL                    0x81

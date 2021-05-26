@@ -1,12 +1,10 @@
 // ASCII font file : "Wide" font 8 by 8 
 // Define the ASCII table as Data array
-// cols left to right 0x00 is  off 0xFF is all on
-// Each character is 8 bits wide one byte height. 
-// so ! is {0x00,0x5f,0x00,0x00,0x00,0x00,0x00,0x00}, 
+// cols left to right , 0x00 is off 0xFF is all on
 // NO LOWERCASE LETTERS
 
-#ifndef font_four_H
-#define font_four_H
+#ifndef _font_four_H
+#define _font_four_H
 
 static const  char Font_Four[]  = {
 	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00, //  

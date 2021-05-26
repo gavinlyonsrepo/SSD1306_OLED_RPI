@@ -1,17 +1,4 @@
 /*
-This is the core graphics library for all ADAFRUIT displays, providing a common
-set of graphics primitives (points, lines, circles, etc.).  It needs to be
-paired with a hardware-specific library for each display device we carry
-(to handle the lower-level functions).
-Adafruit invests time and resources providing this open source code, please
-support Adafruit & open-source hardware by purchasing products from Adafruit!
-Copyright (c) 2013 Adafruit Industries.  All rights reserved.
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
-- Redistributions of source code must retain the above copyright notice.
-*/
-
-/*
 * Project Name: SSD1306_OLED
 * File:SSD1306_OLED_graphics.cpp
 * Description: header file for the  graphics functions
@@ -332,6 +319,8 @@ void SSD1306_graphics::fillTriangle ( int16_t x0, int16_t y0,
 	}
 }
 
+// Desc called form the print class by print functions
+// to draw most data types using polymorphism
 size_t SSD1306_graphics::write(uint8_t c) 
 {
 	if (c == '\n') 
@@ -356,7 +345,7 @@ size_t SSD1306_graphics::write(uint8_t c)
 	return 1;
 }
 
-// Draw a character
+// Draw a character to screen 
 void SSD1306_graphics::drawChar(int16_t x, int16_t y, unsigned char c,
 				uint16_t color, uint16_t bg, uint8_t size) {
 
@@ -365,6 +354,10 @@ if (_FontNumber == 5)
 #ifdef OLED_Font_Five
 	drawCharBigNum(x,  y,  c,  color ,  bg) ;
 	return;
+#else 
+	printf("Error: Font 5 not defined but Font selected\n");
+	return;
+
 #endif
 }
 
@@ -387,22 +380,38 @@ if (_FontNumber == 5)
 			case 1:
 	#ifdef OLED_Font_One
 				line = Font_One[(c - _CurrentFontoffset) * _CurrentFontWidth + i];
+	#else
+			printf("Error: Font 1 not defined but Font selected\n");
+			return;
 	#endif
 			break;
 			case 2:
 	#ifdef OLED_Font_Two
 				line = Font_Two[(c - _CurrentFontoffset) * _CurrentFontWidth + i];
+	#else
+			printf("Error: Font 2 not defined but Font selected\n");
+			return;
 	#endif
 			break;
 			case 3:
 	#ifdef OLED_Font_Three
 				line = Font_Three[(c - _CurrentFontoffset) * _CurrentFontWidth + i];
+	#else
+			printf("Error: Font 3 not defined but Font selected\n");
+			return;
 	#endif
 			break;
 			case 4:
 	#ifdef OLED_Font_Four
 				line = Font_Four[(c - _CurrentFontoffset) * _CurrentFontWidth + i];
+	#else
+			printf("Error: Font 4 not defined but Font selected\n");
+			return;
 	#endif
+			break;
+			default:
+				printf("Error: Wrong font number ,must be 1-4\n");
+				return;
 			break;
 		} //switch font linenumber
 	}
@@ -438,8 +447,6 @@ void SSD1306_graphics::setTextSize(uint8_t s) {
 }
 
 void SSD1306_graphics::setTextColor(uint16_t c) {
-	// For 'transparent' background, we'll set the bg 
-	// to the same as fg instead of using a flag
 	textcolor = textbgcolor = c;
 }
 
@@ -452,7 +459,6 @@ void SSD1306_graphics::setTextWrap(bool w) {
 	wrap = w;
 }
 
-// Return the size of the display 
 int16_t SSD1306_graphics::width(void) const {
 	return _width;
 }
@@ -493,17 +499,17 @@ void SSD1306_graphics::setFontNum(uint8_t FontNumber)
 	enum OLED_Font_width
 	{
 		FONT_W_FIVE = 5, FONT_W_SEVEN = 7, FONT_W_FOUR = 4, FONT_W_EIGHT = 8,FONT_W_16= 16
-	};
+	}; // width of the font in bytes cols.
 	
 	enum OLED_Font_offset
 	{
 		FONT_O_EXTEND = SSD1306_ASCII_OFFSET, FONT_O_SP = SSD1306_ASCII_OFFSET_SP, FONT_N_SP = SSD1306_ASCII_OFFSET_NUM
-	};
+	}; // font offset in the ASCII table
 	
 	enum OLED_Font_height
 	{
 		FONT_H_8 = 8, FONT_H_32 = 32
-	};
+	}; // width of the font in bits
 	
 	enum OLED_Font_width setfontwidth;
 	enum OLED_Font_offset setoffset;
@@ -541,13 +547,13 @@ void SSD1306_graphics::setFontNum(uint8_t FontNumber)
 	}
 }
 
-// Desc: writes a char (c) on the TFT
+// Desc: writes a char (c) on the OLED
 // Param 1 , 2 : coordinates (x, y).
 // Param 3: The ASCII character
-// Param 4: color 565 16-bit
+// Param 4: color 
 // Param 5: background color
 // Notes for font 5 bignums only , font must be included in header file
-
+// called internally from drawChar or called by itself
 void SSD1306_graphics::drawCharBigNum(uint8_t x, uint8_t y, uint8_t c, uint16_t color , uint16_t bg) 
 {
 #ifdef OLED_Font_Five
@@ -580,15 +586,18 @@ void SSD1306_graphics::drawCharBigNum(uint8_t x, uint8_t y, uint8_t c, uint16_t 
 #endif
 }
 
-// Desc: Writes text string (*ptext) on the TFT 
+// Desc: Writes text string (*ptext) on the OLED
 // Param 1 , 2 : coordinates (x, y).
 // Param 3: pointer to string 
 // Param 4: color 
 // Param 5: background color
 // Notes for font 5 only "bignums" 
 
-void SSD1306_graphics::drawTextBigNum(uint8_t x, uint8_t y, char *pText, uint16_t color, uint16_t bg) {
+void SSD1306_graphics::drawTextBigNum(uint8_t x, uint8_t y, 
+						char *pText, uint16_t color, uint16_t bg) 
+{
 	
+#ifdef OLED_Font_Five
 	while (*pText != '\0') 
 	{
 		if (x > (_width - _CurrentFontWidth )) 
@@ -604,5 +613,6 @@ void SSD1306_graphics::drawTextBigNum(uint8_t x, uint8_t y, char *pText, uint16_
 		x += _CurrentFontWidth ;
 		pText++;
 	}
+#endif
 }
 

@@ -1,7 +1,7 @@
 
 // Example file name : main.cpp
 // Description:
-// Test file for SSD1306_OLED library, showing use of hello world for a 128by32 screen
+// Test file SSD1306_OLED lib, showing hello world for a 128by32 screen
 // URL: https://github.com/gavinlyonsrepo/SSD1306_OLED_RPI
 // *****************************
 
@@ -44,7 +44,7 @@ void SetupTest()
 	printf("OLED Begin\r\n");
 	myOLED.OLEDbegin(); // initialize the OLED
 	myOLED.OLEDFillScreen(0xF0, 0); // splash screen bars
-	bcm2835_delay(2000);
+	bcm2835_delay(1000);
 }
 
 void EndTest()

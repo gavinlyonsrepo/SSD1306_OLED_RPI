@@ -1,7 +1,7 @@
 /*
 * Project Name: SSD1306_OLED_RPI
 * File: SSD1306_OLED_font.h
-* Description: 
+* Description: default font , full ASCII
 * Author: Gavin Lyons.
 * URL: https://github.com/gavinlyonsrepo/SSD1306_OLED_RPI
 */
@@ -10,7 +10,7 @@
 #define _SSD1306_OLED_font_H
 
 
-// Standard ASCII 5x7 font , Column padding added by software
+// Standard ASCII 5x8 font , Column padding added by software
 static const unsigned char Font_One[]  = {
    0x00, 0x00, 0x00, 0x00, 0x00,   
 	0x3E, 0x5B, 0x4F, 0x5B, 0x3E,  // :)
