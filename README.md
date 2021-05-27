@@ -5,7 +5,7 @@ Table of contents
 ---------------------------
 
   * [Overview](#overview)
-  * [Installation + Build](#installation + build)
+  * [Installation](#installation)
   * [Hardware](#hardware)
   * [Features](#features)
 
@@ -35,7 +35,7 @@ Overview
 * Based on my [PIC OLED library](https://github.com/gavinlyonsrepo/pic_16F18346_projects) and my [RPI CH1115 SPI OLED library](https://github.com/gavinlyonsrepo/ER_OLEDM1_CH1115_RPI)
 
 
-Installation + Build
+Installation
 ------------------------------
 
 
