@@ -5,7 +5,7 @@ Table of contents
 ---------------------------
 
   * [Overview](#overview)
-  * [Installation](#installation)
+  * [Installation + Build](#installation + build)
   * [Hardware](#hardware)
   * [Features](#features)
 
@@ -35,22 +35,41 @@ Overview
 * Based on my [PIC OLED library](https://github.com/gavinlyonsrepo/pic_16F18346_projects) and my [RPI CH1115 SPI OLED library](https://github.com/gavinlyonsrepo/ER_OLEDM1_CH1115_RPI)
 
 
- Installation
+Installation + Build
 ------------------------------
 
-Install the C libraries of bcm2835, see: http://www.airspayce.com/mikem/bcm2835/
-The bcm2835 is a dependency and provides I2C bus, delays and GPIO control.
-There are 7 different main.cpp in the examples folder copy the one to run into src folder
-"Hello world" is in src by default. Make sure to run test file with sudo
 
-To Install and run "hello world" execute following commands:
+1. Step 1, Make sure I2C bus is enabled on your PI
 
+2. Step 2, install the bcm2835 Library (at time of writing latest version is 1.68.)
+	* The bcm2835 libray is a dependency and provides I2C bus, delays and GPIO control.
+	* Install the C libraries of bcm2835, [Installation instructions here](http://www.airspayce.com/mikem/bcm2835/)
+
+3. Step 3, Download the SSD1306_OLED_RPI library 
+	* Open a Terminal in a folder where you want to create your project.
+	* Run following commands
 ```sh
 curl -sL https://github.com/gavinlyonsrepo/SSD1306_OLED_RPI/archive/1.0.tar.gz | tar xz
 cd SSD1306_OLED_RPI_1.0
+```
+
+4. Step 4, Build the project, by running the makefile included.
+	* The "hello world" example, main.cpp is in the "src" folder ready to go. 
+	* Run make to run the makefile and build the project
+```sh
 make
+```
+
+5. Step 5, Run the program , Be sure to use "sudo" as the bcm2835 demands root permissions.
+
+```sh
 sudo ./bin/test
 ```
+
+6. Step 6, Use other examples.
+	* There are 6 different main.cpp in the examples folder, Copy the main.cpp you want into  "src" folder
+	* Hello world , Speed test , Text and graphics text , bitmap test , Clock Demo, OLED functions.  
+
 
 Hardware
 ----------------------------
