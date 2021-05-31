@@ -5,7 +5,7 @@ Table of contents
 ---------------------------
 
   * [Overview](#overview)
-  * [Installation](#installation)
+  * [Usage](#usage)
   * [Hardware](#hardware)
   * [Features](#features)
 
@@ -25,27 +25,26 @@ Overview
 6. Bitmaps supported.
 7. Hardware I2C using bcm2835 library
 8. Also tested on 128X32 display size. Should work for 96X16 display size.
+9. Dependency: bcm2835 Library
 
 * Author: Gavin Lyons
 * Developed on 
 	1. Raspberry PI 3 model b, 
 	2. C++ complier g++ (Raspbian 6.3.0-18)
 	3. Raspbian 9.13 stretch OS
+	4. bcm2835 Library 1.68 
 
-* Based on my [PIC OLED library](https://github.com/gavinlyonsrepo/pic_16F18346_projects) and my [RPI CH1115 SPI OLED library](https://github.com/gavinlyonsrepo/ER_OLEDM1_CH1115_RPI)
 
-
-Installation
+Usage
 ------------------------------
 
+1. Make sure I2C bus is enabled on your raspberry PI
 
-1. Step 1, Make sure I2C bus is enabled on your PI
-
-2. Step 2, install the bcm2835 Library (at time of writing latest version is 1.68.)
+2. Install the bcm2835 Library (at time of writing latest version is 1.68.)
 	* The bcm2835 libray is a dependency and provides I2C bus, delays and GPIO control.
 	* Install the C libraries of bcm2835, [Installation instructions here](http://www.airspayce.com/mikem/bcm2835/)
 
-3. Step 3, Download the SSD1306_OLED_RPI library 
+3. Download the SSD1306_OLED_RPI library 
 	* Open a Terminal in a folder where you want to create your project.
 	* Run following commands
 ```sh
@@ -53,22 +52,31 @@ curl -sL https://github.com/gavinlyonsrepo/SSD1306_OLED_RPI/archive/1.0.tar.gz |
 cd SSD1306_OLED_RPI_1.0
 ```
 
-4. Step 4, Build the project, by running the makefile included.
+4. Build the project, by running the makefile included.
 	* The "hello world" example, main.cpp is in the "src" folder ready to go. 
-	* Run make to run the makefile and build the project
+	* Run make to run the makefile and build the project.
+	* The makefile does NOT install to system at present, it  builds the code in that folder.
 ```sh
 make
 ```
 
-5. Step 5, Run the program , Be sure to use "sudo" as the bcm2835 demands root permissions.
+5. Run the program to display on OLED.
+	* The makefile creates a executable binary test file at ./bin/test
+	* This program should display hello world on your OLED.
+	* Be sure to use "sudo" as the bcm2835 demands root permissions [ see here for more details](http://www.airspayce.com/mikem/bcm2835/) 
 
 ```sh
 sudo ./bin/test
 ```
 
-6. Step 6, Use other examples.
-	* There are 6 different main.cpp in the examples folder, Copy the main.cpp you want into  "src" folder
-	* Hello world , Speed test , Text and graphics text , bitmap test , Clock Demo, OLED functions.  
+6. Try out other examples  if you wish!
+	* There are 6 different main.cpp in the examples folder, Copy the main.cpp you want to see into  "src" folder
+	* Examples: Hello world , Speed test , Text and graphics test , bitmap test , Clock Demo, OLED functions.  
+
+7. Copy the library code into your project folder directory however you wish to organise it 
+	* The header files are in the include folder in my repo.
+	* And the soucre files are in src in my repo.
+	* If you are not using included makefile to build be sure to include -lbcm2835 flag.
 
 
 Hardware
