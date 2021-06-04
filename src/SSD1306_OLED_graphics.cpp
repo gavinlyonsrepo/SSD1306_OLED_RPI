@@ -351,14 +351,8 @@ void SSD1306_graphics::drawChar(int16_t x, int16_t y, unsigned char c,
 
 if (_FontNumber == 5)
 {
-#ifdef OLED_Font_Five
-	drawCharBigNum(x,  y,  c,  color ,  bg) ;
+	drawCharBigNum(x, y, c, color, bg) ;
 	return;
-#else 
-	printf("Error: Font 5 not defined but Font selected\n");
-	return;
-
-#endif
 }
 
 	if((x >= _width)            || // Clip right
@@ -378,36 +372,16 @@ if (_FontNumber == 5)
 		switch (_FontNumber) 
 		{
 			case 1:
-	#ifdef OLED_Font_One
 				line = Font_One[(c - _CurrentFontoffset) * _CurrentFontWidth + i];
-	#else
-			printf("Error: Font 1 not defined but Font selected\n");
-			return;
-	#endif
 			break;
 			case 2:
-	#ifdef OLED_Font_Two
 				line = Font_Two[(c - _CurrentFontoffset) * _CurrentFontWidth + i];
-	#else
-			printf("Error: Font 2 not defined but Font selected\n");
-			return;
-	#endif
 			break;
 			case 3:
-	#ifdef OLED_Font_Three
 				line = Font_Three[(c - _CurrentFontoffset) * _CurrentFontWidth + i];
-	#else
-			printf("Error: Font 3 not defined but Font selected\n");
-			return;
-	#endif
 			break;
 			case 4:
-	#ifdef OLED_Font_Four
 				line = Font_Four[(c - _CurrentFontoffset) * _CurrentFontWidth + i];
-	#else
-			printf("Error: Font 4 not defined but Font selected\n");
-			return;
-	#endif
 			break;
 			default:
 				printf("Error: Wrong font number ,must be 1-4\n");
@@ -556,7 +530,6 @@ void SSD1306_graphics::setFontNum(uint8_t FontNumber)
 // called internally from drawChar or called by itself
 void SSD1306_graphics::drawCharBigNum(uint8_t x, uint8_t y, uint8_t c, uint16_t color , uint16_t bg) 
 {
-#ifdef OLED_Font_Five
 	uint8_t i, j;
 	uint8_t ctemp = 0, y0 = y; 
 
@@ -583,7 +556,6 @@ void SSD1306_graphics::drawCharBigNum(uint8_t x, uint8_t y, uint8_t c, uint16_t 
 			}
 		}
 	}
-#endif
 }
 
 // Desc: Writes text string (*ptext) on the OLED
@@ -596,8 +568,11 @@ void SSD1306_graphics::drawCharBigNum(uint8_t x, uint8_t y, uint8_t c, uint16_t 
 void SSD1306_graphics::drawTextBigNum(uint8_t x, uint8_t y, 
 						char *pText, uint16_t color, uint16_t bg) 
 {
-	
-#ifdef OLED_Font_Five
+	if (_FontNumber != 5)
+	{
+		printf("Error : font must be five for this function\n");
+		return;
+	}
 	while (*pText != '\0') 
 	{
 		if (x > (_width - _CurrentFontWidth )) 
@@ -613,6 +588,5 @@ void SSD1306_graphics::drawTextBigNum(uint8_t x, uint8_t y,
 		x += _CurrentFontWidth ;
 		pText++;
 	}
-#endif
 }
 

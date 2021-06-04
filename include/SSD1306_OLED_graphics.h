@@ -9,36 +9,10 @@
 #ifndef _SSD1306_OLED_GRAPHICS_H
 #define _SSD1306_OLED_GRAPHICS_H
 
-#include "Print.h"
+#include "SSD1306_OLED_Print.h"
 #include <stdio.h>
 #include <stdint.h>
 #include "SSD1306_OLED_font.h"
-
-
-// ****** USER OPTION FONTS ******
-// Can be commented out if not needed
-#define OLED_Font_One
-#define OLED_Font_Two
-#define OLED_Font_Three
-#define OLED_Font_Four
-#define OLED_Font_Five
-// ********************************
-
-#ifdef OLED_Font_One
-#include "SSD1306_OLED_font.h" // Default 5X8 full extended ASCII
-#endif
-#ifdef OLED_Font_Two
-#include "SSD1306_OLED_font_two.h" // Thick 7X8  (NO LOWERCASE LETTERS)
-#endif
-#ifdef OLED_Font_Three
-#include "SSD1306_OLED_font_three.h" // Seven segment 4X8
-#endif
-#ifdef OLED_Font_Four
-#include "SSD1306_OLED_font_four.h" // Wide  8X8 (NO LOWERCASE LETTERS)
-#endif
-#ifdef OLED_Font_Five
-#include "SSD1306_OLED_font_five.h" // bigNums 16 by 32 1-10 + : . space only
-#endif
 
 #define swap(a, b) { int16_t t = a; a = b; b = t; }
 // Fonts setup

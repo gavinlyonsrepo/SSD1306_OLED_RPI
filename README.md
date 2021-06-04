@@ -5,9 +5,10 @@ Table of contents
 ---------------------------
 
   * [Overview](#overview)
-  * [Usage](#usage)
+  * [Installation](#installation)
   * [Hardware](#hardware)
   * [Features](#features)
+  * [Output](#output)
 
 
 Overview
@@ -17,7 +18,7 @@ Overview
 
 0. Library to support the I2C 128X64 OLED Display Module
    driven by the SSD1306 controller for the Raspberry PI.
-1. Raspberry Pi C++ library.
+1. Dynamic install-able system level Raspberry Pi C++ library.
 2. Inverse color, rotate, sleep, scroll and contrast control.
 3. Default font is Extended ASCII, scalable font.
 4. 4 other fonts included.
@@ -35,55 +36,55 @@ Overview
 	4. bcm2835 Library 1.68 
 
 
-Usage
+Installation
 ------------------------------
 
 1. Make sure I2C bus is enabled on your raspberry PI
 
-2. Install the bcm2835 Library (at time of writing latest version is 1.68.)
-	* The bcm2835 libray is a dependency and provides I2C bus, delays and GPIO control.
+2. Install the dependency bcm2835 Library if not installed (at time of writing latest version is 1.68.)
+	* The bcm2835 library is a dependency and provides I2C bus, delays and GPIO control.
 	* Install the C libraries of bcm2835, [Installation instructions here](http://www.airspayce.com/mikem/bcm2835/)
 
 3. Download the SSD1306_OLED_RPI library 
-	* Open a Terminal in a folder where you want to create your project.
-	* Run following commands
+	* Open a Terminal in a folder where you want to download,build & test library
+	* Run following command to download from github.
+    
 ```sh
-curl -sL https://github.com/gavinlyonsrepo/SSD1306_OLED_RPI/archive/1.0.tar.gz | tar xz
-cd SSD1306_OLED_RPI_1.0
+curl -sL https://github.com/gavinlyonsrepo/SSD1306_OLED_RPI/archive/1.1.tar.gz | tar xz
 ```
 
-4. Build the project, by running the makefile included.
-	* The "hello world" example, main.cpp is in the "src" folder ready to go. 
-	* Run make to run the makefile and build the project.
-	* The makefile does NOT install to system at present, it  builds the code in that folder.
+4. Run "make" to run the makefile in "src" folder to install library, it will be 
+    installed to usr/lib and usr/include
+    
 ```sh
+cd SSD1306_OLED_RPI-1.1/src
+sudo make
+```
+
+5. Next step is to test OLED and installed library with an example.
+Wire up your OLED. Next enter the examples folder and run the makefile in THAT folder, 
+This makefile builds the examples file using the just installed library.
+and creates a test exe file in "bin". Be sure to use "sudo" as the bcm2835 requires root permissions by default [ see here for more details on that](http://www.airspayce.com/mikem/bcm2835/) 
+The default example file is "hello world",  user should see hello world on the OLED
+by end of this step.
+
+```sh
+cd ../examples/
 make
+sudo bin/test
 ```
 
-5. Run the program to display on OLED.
-	* The makefile creates a executable binary test file at ./bin/test
-	* This program should display hello world on your OLED.
-	* Be sure to use "sudo" as the bcm2835 demands root permissions [ see here for more details](http://www.airspayce.com/mikem/bcm2835/) 
-
-```sh
-sudo ./bin/test
-```
-
-6. Try out other examples  if you wish!
-	* There are 6 different main.cpp in the examples folder, Copy the main.cpp you want to see into  "src" folder
-	* Examples: Hello world , Speed test , Text and graphics test , bitmap test , Clock Demo, OLED functions.  
-
-7. Copy the library code into your project folder directory however you wish to organise it 
-	* The header files are in the include folder in my repo.
-	* And the soucre files are in src in my repo.
-	* If you are not using included makefile to build be sure to include -lbcm2835 flag.
+6. There are seven examples files to try out. 
+To decide which one the makefile builds simply edit "SRC" variable at top of the makefile in examples folder.
+in the "User SRC directory Option Section". Pick an example "SRC" directory path and ONE ONLY.
+Comment out the rest and repeat: make and run bin/test.
+Six of the examples are for 128x64 (screen size) OLED , the seventh: named HELLO_WORLD_128_32 is for a 128X32 OLED.
 
 
 Hardware
 ----------------------------
 
-Connections as per manufacturers diagram, I2C bus pull-up resistors are on module.
-If 3.3V regulator on back of module can be powered from 5V PSU.
+Connections as per manufacturers diagram.
 
 ![ wiring ](https://github.com/gavinlyonsrepo/SSD1306_OLED_RPI/blob/main/extras/image/wiring.jpg)
 
@@ -124,3 +125,11 @@ Five fonts available :
 Bitmaps can be turned to data [here at link]( https://javl.github.io/image2cpp/) use horizontal addressing draw mode.
 Use OLEDBitmap to draw bitmaps to buffer.
 You can also write a full screen bitmap direct to screen using OLEDBuffer method, this will use vertical addressing.
+
+
+Output
+--------------------------------
+
+Output of example file "CLOCK_DEMO"
+
+![ op ](https://github.com/gavinlyonsrepo/SSD1306_OLED_RPI/blob/main/extras/image/output.jpg)

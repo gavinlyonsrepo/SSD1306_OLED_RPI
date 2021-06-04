@@ -1,8 +1,10 @@
 
 // Example file name : main.cpp
 // Description:
-// Test file for SSD1306_OLED library, showing fps
+// Test file for SSD1306_OLED library, showing fps frame rate per second
 // URL: https://github.com/gavinlyonsrepo/SSD1306_OLED_RPI
+//
+// Test data for test file
 // Fps 7 bcm2835_i2c_set_baudrate(100000);
 // Fps 16 bcm2835_i2c_setClockDivider(BCM2835_I2C_CLOCK_DIVIDER_626);
 // FPS 25 bcm2835_i2c_setClockDivider(BCM2835_I2C_CLOCK_DIVIDER_148);

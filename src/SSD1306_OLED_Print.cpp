@@ -24,9 +24,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
-#include "Print.h"
+#include "SSD1306_OLED_Print.h"
 
-// Public Methods //////////////////////////////////////////////////////////////
+// Public Methods //////////////////////////
 
 /* default implementation: may be overridden */
 size_t Print::write(const uint8_t *buffer, size_t size)
@@ -38,7 +38,6 @@ size_t Print::write(const uint8_t *buffer, size_t size)
   }
   return n;
 }
-
 
 size_t Print::print(const char str[])
 {
@@ -86,19 +85,6 @@ size_t Print::print(unsigned long n, int base)
 size_t Print::print(double n, int digits)
 {
   return printFloat(n, digits);
-}
-/*
-size_t Print::println(const __FlashStringHelper *ifsh)
-{
-  size_t n = print(ifsh);
-  n += println();
-  return n;
-}
-*/
-
-size_t Print::print(const Printable& x)
-{
-  return x.printTo(*this);
 }
 
 size_t Print::println(void)
@@ -157,12 +143,6 @@ size_t Print::println(double num, int digits)
   return n;
 }
 
-size_t Print::println(const Printable& x)
-{
-  size_t n = print(x);
-  n += println();
-  return n;
-}
 
 // Private Methods /////////////////////////////////////////////////////////////
 
