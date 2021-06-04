@@ -85,5 +85,4 @@ clean:
 	@echo "******************"
 	@echo "[CLEAN OBJECT FILES]"
 	rm -rvf $(OBJ)/*.o ${LIB}.*
-	rmdir -v $(OBJ)
 	@echo "[DONE!]"

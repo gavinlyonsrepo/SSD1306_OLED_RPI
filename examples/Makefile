@@ -48,5 +48,4 @@ clean:
 	@echo '*******'
 	@echo '[CLEANUP!]'
 	rm -vf $(OBJS) $(TARGET)
-	rmdir -v $(BIN) $(OBJ)
 	@echo '[DONE!]'

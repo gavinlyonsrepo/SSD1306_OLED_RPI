@@ -57,7 +57,7 @@ curl -sL https://github.com/gavinlyonsrepo/SSD1306_OLED_RPI/archive/1.1.tar.gz |
     installed to usr/lib and usr/include
     
 ```sh
-cd SSD1306_OLED_RPI-1.1/src
+cd SSD1306_OLED_RPI-1.1
 sudo make
 ```
 
@@ -69,7 +69,7 @@ The default example file is "hello world",  user should see hello world on the O
 by end of this step.
 
 ```sh
-cd ../examples/
+cd examples/
 make
 sudo bin/test
 ```
