@@ -53,7 +53,7 @@ Installation
 curl -sL https://github.com/gavinlyonsrepo/SSD1306_OLED_RPI/archive/1.1.tar.gz | tar xz
 ```
 
-4. Run "make" to run the makefile in "src" folder to install library, it will be 
+4. Run "make" to run the makefile in repo root folder to install library, it will be 
     installed to usr/lib and usr/include
     
 ```sh
