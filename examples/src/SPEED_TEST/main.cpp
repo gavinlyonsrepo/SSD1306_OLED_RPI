@@ -113,7 +113,7 @@ void display_buffer(long currentFramerate, int count)
 	myOLED.print(fps);
 	myOLED.print(" fps");
 	myOLED.setCursor(0, 50);
-	myOLED.print("V 1.0.0");
+	myOLED.print("V 1.2.0");
 	myOLED.drawFastVLine(64, 0, 63, WHITE);
 
 	myOLED.fillRect(70, 10, 20, 20, colour);

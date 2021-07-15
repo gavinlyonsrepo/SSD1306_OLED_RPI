@@ -82,7 +82,10 @@ void TestLoop()
 // Test 7 thick font 2 (NO LOWERCASE)
 // Test 8 seven seg font 3
 // Test 9 wide font (NO LOWERCASE)
-// Test 10 bigNums font (NUMS ONLY + . : space)
+// Test 10 bigNums font 6(NUMS ONLY + :)
+// Test 11 medNums font 5 (NUMS ONLY + :)
+// Test 12 test print float function font 5 & 6 
+
 void DisplayText()
 {
 
@@ -203,13 +206,40 @@ void DisplayText()
 	bcm2835_delay(DisplayDelay1);
 	myOLED.OLEDclearBuffer();
 	
-	//Test 10
+	// Test 10
 	myOLED.setFontNum(5);
-	// Mote '/' gives a space in BigNums font #5
-	char myString[9] = {'1','/','3','2',':','6','.','8'};
-	myOLED.drawChar(0, 0, '8', WHITE, BLACK,1);
-	myOLED.drawTextBigNum(0, 32, myString , BLACK, WHITE);
+	myOLED.setTextColor(WHITE, BLACK);
+	char myString[9] = {'1','9',':','2','2',':','3','8'};
+	myOLED.drawCharNumFont(0, 0, '8', BLACK, WHITE); // single character inverted
+	myOLED.drawTextNumFont(0, 32, myString , WHITE, BLACK); 
+	
 	myOLED.OLEDupdate();  // Write to the buffer
+	bcm2835_delay(DisplayDelay1);
+	myOLED.OLEDclearBuffer();
+	
+	// Test 11 
+	myOLED.setFontNum(6);
+	char mytest[] = "1234567812::5678";
+	myOLED.drawCharNumFont(0, 40, '9', BLACK, WHITE); // single character inverted
+	myOLED.drawTextNumFont(0, 0, mytest, WHITE, BLACK);
+	
+	myOLED.OLEDupdate();
+	bcm2835_delay(DisplayDelay1);
+	myOLED.OLEDclearBuffer();
+	
+	// Test 12 
+	myOLED.setTextColor(WHITE, BLACK);
+	
+	myOLED.setFontNum(5);
+	myOLED.setCursor(0, 0);
+	myOLED.print(87.39);
+	
+	myOLED.setFontNum(6);
+	myOLED.setCursor(0, 40);
+	myOLED.print(3.94);
+	myOLED.print(194);
+	
+	myOLED.OLEDupdate();
 	bcm2835_delay(DisplayDelay1);
 	myOLED.OLEDclearBuffer();
 	

@@ -18,13 +18,13 @@ SSD1306_graphics::SSD1306_graphics(int16_t w, int16_t h):
 	cursor_y  = cursor_x    = 0;
 	rotation = 0;
 	textsize  = 1;
-	textcolor = textbgcolor = 0xFFFF;
+	textcolor = textbgcolor = 0xFF;
 	wrap      = true;
 }
 
 // Draw a circle outline
 void SSD1306_graphics::drawCircle(int16_t x0, int16_t y0, int16_t r,
-	uint16_t color) {
+	uint8_t color) {
 	int16_t f = 1 - r;
 	int16_t ddF_x = 1;
 	int16_t ddF_y = -2 * r;
@@ -58,7 +58,7 @@ void SSD1306_graphics::drawCircle(int16_t x0, int16_t y0, int16_t r,
 }
 
 void SSD1306_graphics::drawCircleHelper( int16_t x0, int16_t y0,
-				 int16_t r, uint8_t cornername, uint16_t color) {
+				 int16_t r, uint8_t cornername, uint8_t color) {
 	int16_t f     = 1 - r;
 	int16_t ddF_x = 1;
 	int16_t ddF_y = -2 * r;
@@ -94,14 +94,14 @@ void SSD1306_graphics::drawCircleHelper( int16_t x0, int16_t y0,
 }
 
 void SSD1306_graphics::fillCircle(int16_t x0, int16_t y0, int16_t r,
-					uint16_t color) {
+					uint8_t color) {
 	drawFastVLine(x0, y0-r, 2*r+1, color);
 	fillCircleHelper(x0, y0, r, 3, 0, color);
 }
 
 // Used to do circles and roundrects
 void SSD1306_graphics::fillCircleHelper(int16_t x0, int16_t y0, int16_t r,
-	uint8_t cornername, int16_t delta, uint16_t color) {
+	uint8_t cornername, int16_t delta, uint8_t color) {
 
 	int16_t f     = 1 - r;
 	int16_t ddF_x = 1;
@@ -133,7 +133,7 @@ void SSD1306_graphics::fillCircleHelper(int16_t x0, int16_t y0, int16_t r,
 
 void SSD1306_graphics::drawLine(int16_t x0, int16_t y0,
 				int16_t x1, int16_t y1,
-				uint16_t color) {
+				uint8_t color) {
 	int16_t steep = abs(y1 - y0) > abs(x1 - x0);
 	if (steep) {
 	swap(x0, y0);
@@ -175,7 +175,7 @@ void SSD1306_graphics::drawLine(int16_t x0, int16_t y0,
 // Draw a rectangle
 void SSD1306_graphics::drawRect(int16_t x, int16_t y,
 				int16_t w, int16_t h,
-				uint16_t color) {
+				uint8_t color) {
 	drawFastHLine(x, y, w, color);
 	drawFastHLine(x, y+h-1, w, color);
 	drawFastVLine(x, y, h, color);
@@ -183,32 +183,29 @@ void SSD1306_graphics::drawRect(int16_t x, int16_t y,
 }
 
 void SSD1306_graphics::drawFastVLine(int16_t x, int16_t y,
-				 int16_t h, uint16_t color) {
-	// Update in subclasses if desired!
+				 int16_t h, uint8_t color) {
 	drawLine(x, y, x, y+h-1, color);
 }
 
 void SSD1306_graphics::drawFastHLine(int16_t x, int16_t y,
-				 int16_t w, uint16_t color) {
-	// Update in subclasses if desired!
-	drawLine(x, y, x+w-1, y, color);
+				 int16_t w, uint8_t color) {
+		drawLine(x, y, x+w-1, y, color);
 }
 
 void SSD1306_graphics::fillRect(int16_t x, int16_t y, int16_t w, int16_t h,
-				uint16_t color) {
-	// Update in subclasses if desired!
+				uint8_t color) {
 	for (int16_t i=x; i<x+w; i++) {
 	drawFastVLine(i, y, h, color);
 	}
 }
 
-void SSD1306_graphics::fillScreen(uint16_t color) {
+void SSD1306_graphics::fillScreen(uint8_t color) {
 	fillRect(0, 0, _width, _height, color);
 }
 
 // Draw a rounded rectangle
 void SSD1306_graphics::drawRoundRect(int16_t x, int16_t y, int16_t w,
-	int16_t h, int16_t r, uint16_t color) {
+	int16_t h, int16_t r, uint8_t color) {
 	drawFastHLine(x+r  , y    , w-2*r, color); // Top
 	drawFastHLine(x+r  , y+h-1, w-2*r, color); // Bottom
 	drawFastVLine(x    , y+r  , h-2*r, color); // Left
@@ -222,7 +219,7 @@ void SSD1306_graphics::drawRoundRect(int16_t x, int16_t y, int16_t w,
 
 // Fill a rounded rectangle
 void SSD1306_graphics::fillRoundRect(int16_t x, int16_t y, int16_t w,
-				 int16_t h, int16_t r, uint16_t color) {
+				 int16_t h, int16_t r, uint8_t color) {
 	// smarter version
 	fillRect(x+r, y, w-2*r, h, color);
 
@@ -234,7 +231,7 @@ void SSD1306_graphics::fillRoundRect(int16_t x, int16_t y, int16_t w,
 // Draw a triangle
 void SSD1306_graphics::drawTriangle(int16_t x0, int16_t y0,
 				int16_t x1, int16_t y1,
-				int16_t x2, int16_t y2, uint16_t color) {
+				int16_t x2, int16_t y2, uint8_t color) {
 	drawLine(x0, y0, x1, y1, color);
 	drawLine(x1, y1, x2, y2, color);
 	drawLine(x2, y2, x0, y0, color);
@@ -243,7 +240,7 @@ void SSD1306_graphics::drawTriangle(int16_t x0, int16_t y0,
 // Fill a triangle
 void SSD1306_graphics::fillTriangle ( int16_t x0, int16_t y0,
 					int16_t x1, int16_t y1,
-					int16_t x2, int16_t y2, uint16_t color) {
+					int16_t x2, int16_t y2, uint8_t color) {
 
 	int16_t a, b, y, last;
 
@@ -279,12 +276,6 @@ void SSD1306_graphics::fillTriangle ( int16_t x0, int16_t y0,
 	sa   = 0,
 	sb   = 0;
 
-	// For upper part of triangle, find scanline crossings for segments
-	// 0-1 and 0-2.  If y1=y2 (flat-bottomed triangle), the scanline y1
-	// is included here (and second loop will be skipped, avoiding a /0
-	// error there), otherwise scanline y1 is skipped here and handled
-	// in the second loop...which also avoids a /0 error here if y0=y1
-	// (flat-topped triangle).
 	if(y1 == y2) last = y1;   // Include y1 scanline
 	else         last = y1-1; // Skip it
 
@@ -293,16 +284,12 @@ void SSD1306_graphics::fillTriangle ( int16_t x0, int16_t y0,
 	b   = x0 + sb / dy02;
 	sa += dx01;
 	sb += dx02;
-	/* longhand:
-	a = x0 + (x1 - x0) * (y - y0) / (y1 - y0);
-	b = x0 + (x2 - x0) * (y - y0) / (y2 - y0);
-	*/
+
 	if(a > b) swap(a,b);
 	drawFastHLine(a, y, b-a+1, color);
 	}
 
-	// For lower part of triangle, find scanline crossings for segments
-	// 0-2 and 1-2.  This loop is skipped if y1=y2.
+
 	sa = dx12 * (y - y1);
 	sb = dx02 * (y - y0);
 	for(; y<=y2; y++) {
@@ -310,10 +297,6 @@ void SSD1306_graphics::fillTriangle ( int16_t x0, int16_t y0,
 	b   = x0 + sb / dy02;
 	sa += dx12;
 	sb += dx02;
-	/* longhand:
-	a = x1 + (x2 - x1) * (y - y1) / (y2 - y1);
-	b = x0 + (x2 - x0) * (y - y0) / (y2 - y0);
-	*/
 	if(a > b) swap(a,b);
 	drawFastHLine(a, y, b-a+1, color);
 	}
@@ -323,37 +306,62 @@ void SSD1306_graphics::fillTriangle ( int16_t x0, int16_t y0,
 // to draw most data types using polymorphism
 size_t SSD1306_graphics::write(uint8_t c) 
 {
-	if (c == '\n') 
+	if (_FontNumber < 5)
 	{
+		if (c == '\n') {
 		cursor_y += textsize*_CurrentFontheight;
 		cursor_x  = 0;
-	} else if (c == '\r') 
-	{
+		} else if (c == '\r') {
 		// skip 
-		asm("nop");
-	}
-	else 
-	{
-	drawChar(cursor_x, cursor_y, c, textcolor, textbgcolor, textsize);
-	cursor_x += textsize*(_CurrentFontWidth+1);
-	if (wrap && (cursor_x > (_width - textsize*(_CurrentFontWidth+1)))) 
-		{
-			cursor_y += textsize*_CurrentFontheight;
-			cursor_x = 0;
+		} else {
+		drawChar(cursor_x, cursor_y, c, textcolor, textbgcolor, textsize);
+		cursor_x += textsize*(_CurrentFontWidth+1);
+			if (wrap && (cursor_x > (_width - textsize*(_CurrentFontWidth+1)))) {
+			  cursor_y += textsize*_CurrentFontheight;
+			  cursor_x = 0;
+			}
 		}
+	}else if (_FontNumber == 5 || _FontNumber == 6)
+	{
+		uint8_t radius = 3;
+		if (_FontNumber == 6) radius = 2;
+		
+		if (c == '\n') 
+		{
+			cursor_y += _CurrentFontheight;
+			cursor_x  = 0;
+		} else if (c == '\r') 
+		{
+			// Skip
+		} else if (c == '.')
+		{
+			// draw a circle for decimal & point skip a space.
+			
+			fillCircle(cursor_x+(_CurrentFontWidth/2), cursor_y + (_CurrentFontheight-6), radius, textcolor);
+			cursor_x += (_CurrentFontWidth+1);
+			if (wrap && (cursor_x  > (_width - (_CurrentFontWidth+1)))) 
+			{
+				cursor_y += _CurrentFontheight;
+				cursor_x = 0;
+			}
+		}else 
+		{
+			drawCharNumFont(cursor_x, cursor_y, c, textcolor, textbgcolor);
+			cursor_x += (_CurrentFontWidth+1);
+			if (wrap && (cursor_x > (_width - (_CurrentFontWidth+1)))) 
+			{
+				cursor_y += _CurrentFontheight;
+				cursor_x = 0;
+			}
+		}
+
 	}
-	return 1;
+  return 1;
 }
 
 // Draw a character to screen 
 void SSD1306_graphics::drawChar(int16_t x, int16_t y, unsigned char c,
-				uint16_t color, uint16_t bg, uint8_t size) {
-
-if (_FontNumber == 5)
-{
-	drawCharBigNum(x, y, c, color, bg) ;
-	return;
-}
+				uint8_t color, uint8_t bg, uint8_t size) {
 
 	if((x >= _width)            || // Clip right
 	 (y >= _height)           || // Clip bottom
@@ -420,11 +428,11 @@ void SSD1306_graphics::setTextSize(uint8_t s) {
 	textsize = (s > 0) ? s : 1;
 }
 
-void SSD1306_graphics::setTextColor(uint16_t c) {
+void SSD1306_graphics::setTextColor(uint8_t c) {
 	textcolor = textbgcolor = c;
 }
 
-void SSD1306_graphics::setTextColor(uint16_t c, uint16_t b) {
+void SSD1306_graphics::setTextColor(uint8_t c, uint8_t b) {
 	textcolor   = c;
 	textbgcolor = b; 
 }
@@ -482,7 +490,7 @@ void SSD1306_graphics::setFontNum(uint8_t FontNumber)
 	
 	enum OLED_Font_height
 	{
-		FONT_H_8 = 8, FONT_H_32 = 32
+		FONT_H_8 = 8, FONT_H_16 = 16, FONT_H_32 = 32
 	}; // width of the font in bits
 	
 	enum OLED_Font_width setfontwidth;
@@ -515,8 +523,17 @@ void SSD1306_graphics::setFontNum(uint8_t FontNumber)
 			_CurrentFontoffset =  (setoffset = FONT_N_SP);
 			_CurrentFontheight = (setfontheight=FONT_H_32);
 		break; 
+		case 6: // med nums 16 by 16 (NUMBERS + : . only)
+			_CurrentFontWidth = (setfontwidth = FONT_W_16);
+			_CurrentFontoffset =  (setoffset = FONT_N_SP);
+			_CurrentFontheight = (setfontheight=FONT_H_16);
+		break; 
 		default:
-			printf("Error: Wrong font number ,must be 1-5\n");
+			printf("Error: Wrong font number ,must be 1-6\n");
+			_CurrentFontWidth = (setfontwidth = FONT_W_FIVE);
+			_CurrentFontoffset =  (setoffset = FONT_O_EXTEND);
+			_CurrentFontheight = (setfontheight=FONT_H_8);
+			_FontNumber = 1;
 		break;
 	}
 }
@@ -526,16 +543,28 @@ void SSD1306_graphics::setFontNum(uint8_t FontNumber)
 // Param 3: The ASCII character
 // Param 4: color 
 // Param 5: background color
-// Notes for font 5 bignums only , font must be included in header file
-// called internally from drawChar or called by itself
-void SSD1306_graphics::drawCharBigNum(uint8_t x, uint8_t y, uint8_t c, uint16_t color , uint16_t bg) 
+// Notes for font 5 , 6 only
+
+void SSD1306_graphics::drawCharNumFont(uint8_t x, uint8_t y, uint8_t c, uint8_t color , uint8_t bg) 
 {
+	if (_FontNumber < 5)
+	{
+		printf("Error: Wrong font selected, must be 5 or 6 \n");
+		return;
+	}
+	
 	uint8_t i, j;
 	uint8_t ctemp = 0, y0 = y; 
 
-	for (i = 0; i < 64; i++) 
+	for (i = 0; i < _CurrentFontheight*2; i++) 
 	{
-		ctemp = Font_Five[c - _CurrentFontoffset][i];
+		if (_FontNumber == 5){
+			ctemp = Font_Five[c - _CurrentFontoffset][i];
+		}
+		else if (_FontNumber == 6){
+			ctemp = Font_Six[c - _CurrentFontoffset][i];
+		}
+		
 		for (j = 0; j < 8; j++) 
 		{
 			if (ctemp & 0x80) 
@@ -563,14 +592,14 @@ void SSD1306_graphics::drawCharBigNum(uint8_t x, uint8_t y, uint8_t c, uint16_t 
 // Param 3: pointer to string 
 // Param 4: color 
 // Param 5: background color
-// Notes for font 5 only "bignums" 
+// Notes for font 5-6 only 
 
-void SSD1306_graphics::drawTextBigNum(uint8_t x, uint8_t y, 
-						char *pText, uint16_t color, uint16_t bg) 
+void SSD1306_graphics::drawTextNumFont(uint8_t x, uint8_t y, 
+						char *pText, uint8_t color, uint8_t bg) 
 {
-	if (_FontNumber != 5)
+	if (_FontNumber < 5)
 	{
-		printf("Error : font must be five for this function\n");
+		printf("Error: Wrong font selected, must be 5 or 6 \n");
 		return;
 	}
 	while (*pText != '\0') 
@@ -584,7 +613,7 @@ void SSD1306_graphics::drawTextBigNum(uint8_t x, uint8_t y,
 				y = x = 0;
 			}
 		}
-		drawCharBigNum(x, y, *pText, color, bg);
+		drawCharNumFont(x, y, *pText, color, bg);
 		x += _CurrentFontWidth ;
 		pText++;
 	}

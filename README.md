@@ -50,14 +50,14 @@ Installation
 	* Run following command to download from github.
     
 ```sh
-curl -sL https://github.com/gavinlyonsrepo/SSD1306_OLED_RPI/archive/1.1.tar.gz | tar xz
+curl -sL https://github.com/gavinlyonsrepo/SSD1306_OLED_RPI/archive/1.2.tar.gz | tar xz
 ```
 
-4. Run "make" to run the makefile in "src" folder to install library, it will be 
+4. Run "make" to run the makefile in base folder to install library, it will be 
     installed to usr/lib and usr/include
     
 ```sh
-cd SSD1306_OLED_RPI-1.1
+cd SSD1306_OLED_RPI-1.2
 sudo make
 ```
 
@@ -104,21 +104,22 @@ Settings are in the "OLED_I2C_ON" method.
 
 *fonts*
 
-There are five fonts.
+There are Six fonts.
 A print class is available to print out most passed data types.
 The fonts 1-4 are byte high(at text size 1) scale-able fonts, columns of padding added by SW.
-Font 5 is special font large font but it is numbers only and cannot
-use the print class or be scaled(just one size).  
+Font 5-6 are large numerical fonts and cannot be scaled(just one size).  
+It is possible to use ':' and '.' symbol with these fonts, see examples.
 
-Five fonts available : 
+Six fonts available : 
 
 | Font num | Font name | Font size xbyy |  Note |
 | ------ | ------ | ------ | ------ |  
-| 1 | Default | 5x8 | Full Extended ASCII 0 - 0xFF |
-| 2 | Thick   | 7x8 | no lowercase letters , ASCII  0x20 - 0x5A |
+| 1 | Default | 5x8 | Full Extended ASCII 0x00 - 0xFF |
+| 2 | Thick   | 7x8 | ASCII  0x20 - 0x5A  ,no lowercase letters |
 | 3 | Seven segment | 4x8 | ASCII  0x20 - 0x7A |
-| 4 | Wide | 8x8 | no lowercase letters, ASCII 0x20 - 0x5A |
-| 5 | Big Nums | 16x32 | ASCII 0x2E-0x3A ,Numbers + : . only |
+| 4 | Wide | 8x8 | ASCII 0x20 - 0x5A , no lowercase letters |
+| 5 | Big Nums | 16x32 | ASCII 0x30-0x3A , Numbers + : only |
+| 6 | med Nums | 16x16 | ASCII 0x30-0x3A , Numbers + : only |
 
 *bitmaps*
 

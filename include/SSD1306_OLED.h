@@ -84,7 +84,7 @@ class SSD1306 : public SSD1306_graphics  {
 
 	uint8_t* buffer = nullptr;
 
-	virtual void drawPixel(int16_t x, int16_t y, uint16_t colour) override;
+	virtual void drawPixel(int16_t x, int16_t y, uint8_t color) override;
 	void OLEDupdate(void);
 	void OLEDclearBuffer(void);
 	void OLEDBuffer(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t* data);

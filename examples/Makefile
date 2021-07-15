@@ -7,13 +7,13 @@
 # pick on example "SRC" dir and ONE ONLY.
 # Comment out the other 5. #
 
-SRC=HELLO_WORLD
-#SRC=BITMAP
-#SRC=CLOCK_DEMO
-#SRC=OLED_FUNCTIONS
-#SRC=SPEED_TEST
-#SRC=TEXT_GRAPHICS
-#SRC=HELLO_WORLD_128_32
+SRC=src/HELLO_WORLD
+#SRC=src/BITMAP
+#SRC=src/CLOCK_DEMO
+#SRC=src/OLED_FUNCTIONS
+#SRC=src/SPEED_TEST
+#SRC=src/TEXT_GRAPHICS
+#SRC=src/HELLO_WORLD_128_32
 # ************************************************
 
 CC=g++

@@ -292,7 +292,7 @@ void SSD1306::OLEDBuffer(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t* da
 
 // Desc: Draws a Pixel to the screen overides the gfx lib if defined
 // Passed x and y co-ords and colour of pixel.
-void SSD1306::drawPixel(int16_t x, int16_t y, uint16_t colour)
+void SSD1306::drawPixel(int16_t x, int16_t y, uint8_t color)
 {
 
 	if ((x < 0) || (x >= this->bufferWidth) || (y < 0) || (y >= this->bufferHeight)) {
@@ -316,7 +316,7 @@ void SSD1306::drawPixel(int16_t x, int16_t y, uint16_t colour)
 	break;
 	}
 		uint16_t tc = (bufferWidth * (y /8)) + x;
-		switch (colour)
+		switch (color)
 		{
 			case WHITE:  this->buffer[tc] |= (1 << (y & 7)); break;
 			case BLACK:  this->buffer[tc] &= ~(1 << (y & 7)); break;
