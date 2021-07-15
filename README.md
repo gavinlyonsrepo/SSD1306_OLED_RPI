@@ -50,10 +50,14 @@ Installation
 	* Run following command to download from github.
     
 ```sh
-curl -sL https://github.com/gavinlyonsrepo/SSD1306_OLED_RPI/archive/1.2.tar.gz | tar xz
+curl -sL https://github.com/gavinlyonsrepo/SSD1306_OLED_RPI/archive/1.1.tar.gz | tar xz
 ```
 
+<<<<<<< HEAD
 4. Run "make" to run the makefile in base folder to install library, it will be 
+=======
+4. Run "make" to run the makefile in repo root folder to install library, it will be 
+>>>>>>> 39577d4a569e72ab5f2573ce412cb55b125905b1
     installed to usr/lib and usr/include
     
 ```sh
