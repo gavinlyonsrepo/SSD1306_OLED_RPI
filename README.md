@@ -21,7 +21,7 @@ Overview
 1. Dynamic install-able system level Raspberry Pi C++ library.
 2. Inverse color, rotate, sleep, scroll and contrast control.
 3. Default font is Extended ASCII, scalable font.
-4. 4 other fonts included.
+4. 5 other fonts included.
 5. Graphics class included.
 6. Bitmaps supported.
 7. Hardware I2C using bcm2835 library
