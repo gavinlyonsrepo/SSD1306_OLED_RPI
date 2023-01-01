@@ -14,6 +14,7 @@
 #define myOLEDwidth  128
 #define myOLEDheight 64
 uint8_t fullscreenBuffer[1024];
+const uint16_t I2C_Speed = 622; //  bcm2835I2CClockDivider 
 
 SSD1306 myOLED(myOLEDwidth ,myOLEDheight) ; // instantiate  an object
 
@@ -55,7 +56,7 @@ int8_t setup()
 	}
 	bcm2835_delay(50);
 	printf("OLED Begin\r\n");
-	myOLED.OLEDbegin(); // initialize the OLED
+	myOLED.OLEDbegin(I2C_Speed); // initialize the OLED
 
 	return 1;
 }
@@ -114,8 +115,8 @@ void DisplayClock(void)
 		myOLED.setCursor(55,44);
 		myOLED.print(count);
 		
-		myOLED.OLEDBitmap(80, 40, 20, 20,  smallImage, false); 
-		myOLED.OLEDBitmap(100, 40, 20, 20,  smallImage, true);
+		myOLED.OLEDBitmap(80, 40, 16, 8,  MsgIcon, false); 
+		myOLED.OLEDBitmap(100, 40, 16, 8, MsgIcon, true);
 		bcm2835_delay(1000);
 		myOLED.OLEDupdate();
 		myOLED.OLEDclearBuffer();

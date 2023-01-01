@@ -61,10 +61,10 @@ install:
 	@echo
 	@echo "[INSTALL HEADERS]"
 	@if ( test ! -d $(PREFIX)/include ) ; then mkdir -p $(PREFIX)/include ; fi
-	@cp -vf  include/SSD1306_OLED.h $(PREFIX)/include
-	@cp -vf  include/SSD1306_OLED_graphics.h $(PREFIX)/include
-	@cp -vf  include/SSD1306_OLED_Print.h $(PREFIX)/include
-	@cp -vf  include/SSD1306_OLED_font.h $(PREFIX)/include
+	@cp -vf  include/SSD1306_OLED.hpp $(PREFIX)/include
+	@cp -vf  include/SSD1306_OLED_graphics.hpp $(PREFIX)/include
+	@cp -vf  include/SSD1306_OLED_Print.hpp $(PREFIX)/include
+	@cp -vf  include/SSD1306_OLED_font.hpp $(PREFIX)/include
 	@echo "[DONE!]"
 
 # Uninstall the library
@@ -74,10 +74,10 @@ uninstall:
 	@rm -vf ${LIBDIR}/${LIB}.*
 
 	@echo "[UNINSTALL HEADERS]"
-	@rm -rvf  $(PREFIX)/include/SSD1306_OLED.h
-	@rm -rvf  $(PREFIX)/include/SSD1306_OLED_graphics.h
-	@rm -rvf  $(PREFIX)/include/SSD1306_OLED_Print.h
-	@rm -rvf  $(PREFIX)/include/SSD1306_OLED_font.h
+	@rm -rvf  $(PREFIX)/include/SSD1306_OLED.hpp
+	@rm -rvf  $(PREFIX)/include/SSD1306_OLED_graphics.hpp
+	@rm -rvf  $(PREFIX)/include/SSD1306_OLED_Print.hpp
+	@rm -rvf  $(PREFIX)/include/SSD1306_OLED_font.hpp
 	@echo "[DONE!]"
 
 # clear build files

@@ -16,7 +16,7 @@
 
 #define myOLEDwidth  128
 #define myOLEDheight 64
-
+const uint16_t I2C_Speed = 622; //  bcm2835I2CClockDivider 
 SSD1306 myOLED(myOLEDwidth ,myOLEDheight) ; // instantiate  an object
 
 // vars for the test
@@ -63,7 +63,7 @@ uint8_t setup()
 	}
 	bcm2835_delay(50);
 	printf("OLED Begin\r\n");
-	myOLED.OLEDbegin(); // initialize the OLED
+	myOLED.OLEDbegin(I2C_Speed ); // initialize the OLED
 	myOLED.OLEDFillScreen(0x01, 0); //splash screen bars
 	bcm2835_delay(1500);
 	myOLED.setTextColor(WHITE);

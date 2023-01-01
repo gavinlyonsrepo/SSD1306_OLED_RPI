@@ -9,17 +9,12 @@
 #ifndef _SSD1306_OLED_GRAPHICS_H
 #define _SSD1306_OLED_GRAPHICS_H
 
-#include "SSD1306_OLED_Print.h"
-#include "SSD1306_OLED_font.h"
 #include <stdio.h>
 #include <stdint.h>
-
+#include "SSD1306_OLED_Print.h"
+#include "SSD1306_OLED_font.h"
 
 #define swap(a, b) { int16_t t = a; a = b; b = t; }
-// Fonts setup
-#define SSD1306_ASCII_OFFSET 0x00
-#define SSD1306_ASCII_OFFSET_SP 0x20 // Starts at Space
-#define SSD1306_ASCII_OFFSET_NUM  0x30 // Starts at number 0
 
 class SSD1306_graphics : public Print{
 
@@ -38,8 +33,6 @@ class SSD1306_graphics : public Print{
 	fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint8_t color),
 	fillScreen(uint8_t color);
 
-
-  // no subclass overrides
   void
 	drawCircle(int16_t x0, int16_t y0, int16_t r, uint8_t color),
 	drawCircleHelper(int16_t x0, int16_t y0, int16_t r, uint8_t cornername,
@@ -62,13 +55,15 @@ class SSD1306_graphics : public Print{
 	setTextColor(uint8_t c, uint8_t bg),
 	setTextSize(uint8_t s),
 	setTextWrap(bool w),
-	setFontNum(uint8_t FontNumber),
+	setFontNum(OLEDFontType_e FontNumber),
 	setRotation(uint8_t r);
 	
-  virtual size_t write(uint8_t);
+	virtual size_t write(uint8_t);
 
 	void drawCharNumFont(uint8_t x, uint8_t y, uint8_t c, uint8_t color ,uint8_t bg);
 	void drawTextNumFont(uint8_t x, uint8_t y, char *pText, uint8_t color, uint8_t bg);
+	void drawText(uint8_t x, uint8_t y, char *pText, uint8_t color, uint8_t bg, uint8_t size);
+	
 	int16_t height(void) const;
 	int16_t width(void) const;
 	uint8_t getRotation(void) const;

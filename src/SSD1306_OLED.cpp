@@ -17,8 +17,12 @@ SSD1306  :: SSD1306(int16_t oledwidth, int16_t oledheight) :SSD1306_graphics(ole
 }
 
 // Desc: begin Method initialise OLED
-void SSD1306::OLEDbegin()
+// Param 1  :: I2C speed default = 0 
+// 0 = //bcm2835_i2c_set_baudrate(100000); //100k baudrate
+// > 0 = BCM2835_I2C_CLOCK_DIVIDER, choices = 2500 , 622 , 150 , 148
+void SSD1306::OLEDbegin( uint16_t I2C_speed )
 {
+	_ I2C_speed = I2C_speed;
 	OLED_I2C_ON();
 	OLEDinit();
 	OLED_I2C_OFF();
@@ -30,17 +34,20 @@ void SSD1306::OLED_I2C_ON()
 	// to alternate function ALT0, which enables those pins for I2C interface. 
 	if (!bcm2835_i2c_begin())
 	{
-		printf("Error: Cannot start I2C\n");
+		printf("Error: Cannot start I2C, Running root?\n");
 		return;
 	}
 	bcm2835_i2c_setSlaveAddress(SSD1306_ADDR);  //i2c address
-	bcm2835_i2c_setClockDivider(BCM2835_I2C_CLOCK_DIVIDER_626);
 	
-	//(1) BCM2835_I2C_CLOCK_DIVIDER_626  ：622 = 2.504us = 399.3610 kHz
-	//Clock divided is based on nominal base clock rate of 250MHz
-	
-	// (2) or use set_baudrate instead of clockdivder
-	//bcm2835_i2c_set_baudrate(100000); //100k baudrate
+	if ( _I2C_speed > 0)  
+	{
+		// BCM2835_I2C_CLOCK_DIVIDER enum choice  2500 622 150 148
+		// Clock divided is based on nominal base clock rate of 250MHz
+		bcm2835_i2c_setClockDivider(_I2C_speed);
+	} else{
+		// default or use set_baudrate instead of clockdivder 100k
+		bcm2835_i2c_set_baudrate(100000); //100k baudrate
+	}
 }
 
 // Desc: End I2C operations. 
@@ -224,12 +231,15 @@ for (int16_t j = 0; j < h; j++, y++)
 void SSD1306::I2C_Write_Byte(uint8_t value, uint8_t Cmd)
 {
 	char buf[2] = {Cmd,value};
-	int ref = bcm2835_i2c_write(buf, 2);
-
-	while(ref != 0)
-	{
-		ref = bcm2835_i2c_write(buf, 2);
-		if(ref == 0) break;
+	uint8_t returnCode = bcm2835_i2c_write(buf, 2);
+	uint8_t attemptI2Cwrite = 0;
+	while(returnCode  != 0 || attemptCode >= 3)
+	{ // failure to write I2C byte 
+		attemptI2Cwrite ++;
+		printf("Error I2C: Cannot Write byte :: %u\n", attemptI2Cwrite);
+		printf("bcm2835I2CReasonCodes :: Error code %u\n", returnCode);
+		returnCode  = bcm2835_i2c_write(buf, 2);
+		bcm2835_delay(100); //mS
 	}
 }
 

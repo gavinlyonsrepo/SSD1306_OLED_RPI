@@ -92,7 +92,7 @@ class SSD1306 : public SSD1306_graphics  {
 	void OLEDFillPage(uint8_t page_num, uint8_t pixels,uint8_t delay);
 	void OLEDBitmap(int16_t x, int16_t y, int16_t w, int16_t h, const uint8_t* data, bool invert);
 	
-	void OLEDbegin(void);
+	void OLEDbegin(uint16_t I2C_speed = 0);
 	void OLEDinit(void);
 	void OLEDReset(void);
 	void OLEDPowerDown(void);
@@ -113,6 +113,7 @@ class SSD1306 : public SSD1306_graphics  {
 	void I2C_Write_Byte(uint8_t value, uint8_t Cmd);
 	void OLED_I2C_OFF(void);
 	void OLED_I2C_ON(void);
+	uint16_t _I2C_speed = 0 ;
 	
 	int16_t _OLED_WIDTH;
 	int16_t _OLED_HEIGHT;

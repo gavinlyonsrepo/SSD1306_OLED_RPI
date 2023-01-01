@@ -15,6 +15,7 @@
 #define DisplayDelay1 4000
 #define DisplayDelay2 0
 
+const uint16_t I2C_Speed = 622; //  bcm2835I2CClockDivider 
 SSD1306 myOLED(myOLEDwidth ,myOLEDheight) ; // instantiate  an object
 
 // =============== Function prototype ================
@@ -23,6 +24,7 @@ void TestLoop(void);
 void DisplayText( );
 void DisplayGraphics( );
 void EndTest(void);
+void TestReset(void);
 
 // ======================= Main ===================
 int main(int argc, char **argv)
@@ -47,7 +49,7 @@ void SetupTest()
 {
 	bcm2835_delay(500);
 	printf("OLED Begin\r\n");
-	myOLED.OLEDbegin(); // initialize the OLED
+	myOLED.OLEDbegin(I2C_Speed); // initialize the OLED
 	myOLED.OLEDFillScreen(0x8F, 0); //splash screen bars
 	bcm2835_delay(1000);
 }
@@ -71,6 +73,11 @@ void TestLoop()
 	DisplayGraphics();
 }
 
+void TestReset(void){
+	myOLED.OLEDupdate();
+	bcm2835_delay(DisplayDelay1);
+	myOLED.OLEDclearBuffer();
+}
 
 // DisplayText() : Desc :A series of tests to test the text mode
 // Test 1 Font size 3 float
@@ -82,9 +89,12 @@ void TestLoop()
 // Test 7 thick font 2 (NO LOWERCASE)
 // Test 8 seven seg font 3
 // Test 9 wide font (NO LOWERCASE)
-// Test 10 bigNums font 6(NUMS ONLY + :)
-// Test 11 medNums font 5 (NUMS ONLY + :)
-// Test 12 test print float function font 5 & 6 
+// Test 10 tiny font
+// Test 11 homespun font
+// Test 12 bigNums font 7(NUMS ONLY + :)
+// Test 13 medNums font 8 (NUMS ONLY + :)
+// Test 14 test print method 
+// Test 15 Drawtext
 
 void DisplayText()
 {
@@ -115,9 +125,7 @@ void DisplayText()
 	// Test 4
 	myOLED.drawChar(95, 15 , 'H', WHITE, BLACK, 6);
 
-	myOLED.OLEDupdate();  // Write to the buffer
-	bcm2835_delay(DisplayDelay1);
-	myOLED.OLEDclearBuffer();
+	TestReset();
 
 	// Test 5
 	myOLED.setCursor(0, 0);
@@ -134,9 +142,7 @@ void DisplayText()
 		myOLED.print(i);
 		bcm2835_delay(DisplayDelay2);
 	}
-	myOLED.OLEDupdate();  // Write to the buffer
-	bcm2835_delay(DisplayDelay1);
-	myOLED.OLEDclearBuffer();
+	TestReset();
 
 	myOLED.setCursor(0, 0);
 	myOLED.setTextColor(WHITE);
@@ -159,12 +165,10 @@ void DisplayText()
 		bcm2835_delay(DisplayDelay2);
 	}
 
-	myOLED.OLEDupdate();  // Write to the buffer
-	bcm2835_delay(DisplayDelay1);
-	myOLED.OLEDclearBuffer();
+	TestReset();
 	
 	// Test 7
-	myOLED.setFontNum(2);
+	myOLED.setFontNum(OLEDFontType_Thick);
 	myOLED.setTextSize(1);
 	myOLED.setCursor(0, 0);
 	myOLED.print("THE THICK FONT");
@@ -174,12 +178,10 @@ void DisplayText()
 	myOLED.setCursor(0, 45);
 	myOLED.setTextSize(2);
 	myOLED.print("TEST");
-	myOLED.OLEDupdate();  // Write to the buffer
-	bcm2835_delay(DisplayDelay1);
-	myOLED.OLEDclearBuffer();
+	TestReset();
 	
 	// Test 8
-	myOLED.setFontNum(3);
+	myOLED.setFontNum(OLEDFontType_SevenSeg);
 	myOLED.setTextSize(1);
 	myOLED.setCursor(0, 0);
 	myOLED.print("SEVEN SEG Font");
@@ -188,12 +190,10 @@ void DisplayText()
 	myOLED.setCursor(0, 30);
 	myOLED.setTextSize(5);
 	myOLED.print("14:30");
-	myOLED.OLEDupdate();  // Write to the buffer
-	bcm2835_delay(DisplayDelay1);
-	myOLED.OLEDclearBuffer();
+	TestReset();
 	
 	// Test 9
-	myOLED.setFontNum(4);
+	myOLED.setFontNum(OLEDFontType_Wide);
 	myOLED.setTextSize(1);
 	myOLED.setCursor(0, 0);
 	myOLED.print("WIDE FONT");
@@ -202,12 +202,34 @@ void DisplayText()
 	myOLED.setCursor(0, 30);
 	myOLED.setTextSize(2);
 	myOLED.print("13:57");
-	myOLED.OLEDupdate();  // Write to the buffer
-	bcm2835_delay(DisplayDelay1);
-	myOLED.OLEDclearBuffer();
+	TestReset();
 	
 	// Test 10
-	myOLED.setFontNum(5);
+	myOLED.setFontNum(OLEDFontType_Tiny);
+	myOLED.setTextSize(1);
+	myOLED.setCursor(0, 0);
+	myOLED.print("tiny Font:");
+	myOLED.setCursor(0, 15);
+	myOLED.print("123456 tiny");
+	myOLED.setCursor(0, 35);
+	myOLED.setTextSize(2);
+	myOLED.print("T 11:52");
+	TestReset();
+	
+	// Test 11
+	myOLED.setFontNum(OLEDFontType_Homespun);
+	myOLED.setTextSize(1);
+	myOLED.setCursor(0, 0);
+	myOLED.print("Home Font:");
+	myOLED.setCursor(0, 15);
+	myOLED.print("123456 home");
+	myOLED.setCursor(0, 35);
+	myOLED.setTextSize(2);
+	myOLED.print("T 19:24");
+	TestReset();
+	
+	// Test 12
+	myOLED.setFontNum(OLEDFontType_Bignum);
 	myOLED.setTextColor(WHITE, BLACK);
 	char myString[9] = {'1','9',':','2','2',':','3','8'};
 	myOLED.drawCharNumFont(0, 0, '8', BLACK, WHITE); // single character inverted
@@ -217,33 +239,48 @@ void DisplayText()
 	bcm2835_delay(DisplayDelay1);
 	myOLED.OLEDclearBuffer();
 	
-	// Test 11 
-	myOLED.setFontNum(6);
-	char mytest[] = "1234567812::5678";
+	// Test 13
+	myOLED.setFontNum(OLEDFontType_Mednum);
+	char myTest[] = "1234567812::5678";
 	myOLED.drawCharNumFont(0, 40, '9', BLACK, WHITE); // single character inverted
-	myOLED.drawTextNumFont(0, 0, mytest, WHITE, BLACK);
+	myOLED.drawTextNumFont(0, 0, myTest, WHITE, BLACK);
 	
-	myOLED.OLEDupdate();
-	bcm2835_delay(DisplayDelay1);
-	myOLED.OLEDclearBuffer();
+	TestReset();
 	
-	// Test 12 
+	// Test 14 print
 	myOLED.setTextColor(WHITE, BLACK);
 	
-	myOLED.setFontNum(5);
+	myOLED.setFontNum(OLEDFontType_Bignum);
 	myOLED.setCursor(0, 0);
-	myOLED.print(87.39);
+	myOLED.print(-87.39);
 	
-	myOLED.setFontNum(6);
+	myOLED.setFontNum(OLEDFontType_Mednum);
 	myOLED.setCursor(0, 40);
 	myOLED.print(3.94);
-	myOLED.print(194);
+	myOLED.print(-194);
 	
-	myOLED.OLEDupdate();
-	bcm2835_delay(DisplayDelay1);
-	myOLED.OLEDclearBuffer();
+	TestReset();
 	
-} // end
+	// Test 14b print
+	 myOLED.setFontNum(OLEDFontType_Default);
+	myOLED.setCursor(0, 0);
+	myOLED.print(47 , DEC);
+	myOLED.setCursor(0, 16);
+	myOLED.print(47 , HEX); 
+	myOLED.setCursor(0, 32);
+	myOLED.print(47, BIN);
+	myOLED.setCursor(0, 48);
+	myOLED.print(47 , OCT);
+	TestReset();
+	
+	// Test 15 drawtext
+	myOLED.setFontNum(OLEDFontType_Tiny);
+	myOLED.drawText(0,0, myString, FOREGROUND, BACKGROUND,1);
+	myOLED.setFontNum(OLEDFontType_Wide);
+	myOLED.drawText(0,32, myTest, FOREGROUND, BACKGROUND,2);
+	TestReset(); 
+	
+} // end  DisplayText()
 
 // Function to display Graphics.
 void  DisplayGraphics()
