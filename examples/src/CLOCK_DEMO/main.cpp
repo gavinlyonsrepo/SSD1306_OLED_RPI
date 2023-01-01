@@ -1,6 +1,6 @@
-
+// *****************************
 // Example file name : main.cpp
-// Description: Test file showing "clock demo"
+// Description: Test file showing a "clock demo"
 // URL: https://github.com/gavinlyonsrepo/SSD1306_OLED_RPI
 // *****************************
 
@@ -8,14 +8,15 @@
 #include <bcm2835.h>
 #include <time.h>
 #include <stdio.h>
-#include "SSD1306_OLED.h"
-#include "Bitmap_test_data.h" // Test data for bitmaps
+
+#include "SSD1306_OLED.hpp"
+#include "Bitmap_test_data.hpp" // Test data for bitmaps
 
 #define myOLEDwidth  128
 #define myOLEDheight 64
 uint8_t fullscreenBuffer[1024];
-const uint16_t I2C_Speed = 622; //  bcm2835I2CClockDivider 
-
+const uint16_t I2C_Speed = 626; //  bcm2835I2CClockDivider 
+const uint8_t I2C_Address = 0x3C;
 SSD1306 myOLED(myOLEDwidth ,myOLEDheight) ; // instantiate  an object
 
 // =============== Function prototype ================
@@ -56,7 +57,7 @@ int8_t setup()
 	}
 	bcm2835_delay(50);
 	printf("OLED Begin\r\n");
-	myOLED.OLEDbegin(I2C_Speed); // initialize the OLED
+	myOLED.OLEDbegin(I2C_Speed, I2C_Address); // initialize the OLED
 
 	return 1;
 }
@@ -98,7 +99,7 @@ void DisplayClock(void)
 		myOLED.drawLine(40,35,40,63,WHITE);
 		myOLED.drawLine(75,35,75,63,WHITE);
 		
-		myOLED.setFontNum(1);
+		myOLED.setFontNum(OLEDFontType_Default);
 		myOLED.setTextSize(2);
 		myOLED.setCursor(20,17);
 		sprintf(displayStr, "%i%i:%i%i:%i%i",timenow->tm_hour / 10,
@@ -106,7 +107,7 @@ void DisplayClock(void)
 				timenow->tm_min % 10,timenow->tm_sec / 10,timenow->tm_sec % 10);
 		myOLED.print(displayStr);
 		
-		myOLED.setFontNum(1);
+		myOLED.setFontNum(OLEDFontType_Default);
 		myOLED.setTextSize(1);
 		myOLED.setCursor(5,44);
 		sprintf(displayStr, "%i%i/%i%i",timenow->tm_mday / 10,timenow->tm_mday % 10, timenow->tm_mon / 10,timenow->tm_mon % 10);

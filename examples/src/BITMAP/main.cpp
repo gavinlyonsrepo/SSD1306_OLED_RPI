@@ -1,4 +1,4 @@
-
+// *****************************
 // Example file name : main.cpp
 // Description: Test file showing how to display bitmaps.
 // URL: https://github.com/gavinlyonsrepo/SSD1306_OLED_RPI
@@ -8,14 +8,14 @@
 #include <bcm2835.h>
 #include <time.h>
 #include <stdio.h>
-#include "SSD1306_OLED.h"
-#include "Bitmap_test_data.h"
+#include "SSD1306_OLED.hpp"
+#include "Bitmap_test_data.hpp"
 
 #define myOLEDwidth  128
 #define myOLEDheight 64
-uint8_t fullscreenBuffer[1024];
-const uint16_t I2C_Speed = 622; //  bcm2835I2CClockDivider 
-
+uint8_t fullscreenBuffer[1024]; // buffer
+const uint16_t I2C_Speed = 626; //  bcm2835I2CClockDivider, see readme
+const uint8_t I2C_Address = 0x3C;
 SSD1306 myOLED(myOLEDwidth ,myOLEDheight) ; // instantiate  an object
 
 // =============== Function prototype ================
@@ -29,10 +29,7 @@ void EndTests(void);
 // ======================= Main ===================
 int main(int argc, char **argv)
 {
-	if (!setup())
-	{
-		return -1;
-	}
+	if (!setup()){return -1;}
 	myLoop();
 	EndTests();
 	return 0;
@@ -57,7 +54,7 @@ int8_t setup()
 	}
 	bcm2835_delay(50);
 	printf("OLED Begin\r\n");
-	myOLED.OLEDbegin(I2C_Speed); // initialize the OLED
+	myOLED.OLEDbegin(I2C_Speed, I2C_Address); // initialize the OLED
 	myOLED.OLEDFillScreen(0x01, 0); //splash screen
 	bcm2835_delay(1500);
 	return 1;
@@ -73,7 +70,7 @@ void myLoop()
 
 void Test1(void)
 {
-	myOLED.buffer = (uint8_t*) &fullscreenBuffer;
+	myOLED.buffer = (uint8_t*) &fullscreenBuffer; // buffer to the pointer
 	myOLED.OLEDBitmap(0, 0 , 64, 64, bigImage, false);
 	myOLED.OLEDupdate();
 	

@@ -4,8 +4,8 @@
 
 # ************************************************
 # User SRC directory Option Section
-# pick on example "SRC" dir and ONE ONLY.
-# Comment out the other 5. #
+# Pick on example "SRC" dir path and ONE Only.
+# Comment out the other's. 
 
 SRC=src/HELLO_WORLD
 #SRC=src/BITMAP
@@ -15,6 +15,13 @@ SRC=src/HELLO_WORLD
 #SRC=src/TEXT_GRAPHICS
 #SRC=src/HELLO_WORLD_128_32
 # ************************************************
+
+# ********************
+# Options
+# 1. make  
+# 2. make clean
+# 3. make run 
+# ********************
 
 CC=g++
 LDFLAGS= -lbcm2835 -lrt -lSSD1306_OLED_RPI 
@@ -28,9 +35,13 @@ TARGET=$(BIN)/test
 
 all: clean pre-build $(TARGET) 
 
+run:
+	sudo $(TARGET)
+
 pre-build:
 	@echo '*******'
 	@echo '[START!]'
+	@echo 'Building: ' $(SRC)
 	$(MD) -vp $(BIN)
 	$(MD) -vp $(OBJ)
 

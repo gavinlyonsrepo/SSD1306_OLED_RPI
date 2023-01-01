@@ -1,3 +1,4 @@
+// *****************************
 // Example file name : main.cpp
 // Description:
 // Test file for SSD1306_OLED_RPI library, showing use of TEXT mode & graphics.
@@ -5,9 +6,10 @@
 // *****************************
 
 #include <bcm2835.h>
-#include "SSD1306_OLED.h"
 #include <time.h>
 #include <stdio.h>
+
+#include "SSD1306_OLED.hpp"
 
 #define myOLEDwidth  128
 #define myOLEDheight 64
@@ -15,7 +17,8 @@
 #define DisplayDelay1 4000
 #define DisplayDelay2 0
 
-const uint16_t I2C_Speed = 622; //  bcm2835I2CClockDivider 
+const uint16_t I2C_Speed = 626; //  bcm2835I2CClockDivider 
+const uint8_t I2C_Address = 0x3C;
 SSD1306 myOLED(myOLEDwidth ,myOLEDheight) ; // instantiate  an object
 
 // =============== Function prototype ================
@@ -49,7 +52,7 @@ void SetupTest()
 {
 	bcm2835_delay(500);
 	printf("OLED Begin\r\n");
-	myOLED.OLEDbegin(I2C_Speed); // initialize the OLED
+	myOLED.OLEDbegin(I2C_Speed, I2C_Address); // initialize the OLED
 	myOLED.OLEDFillScreen(0x8F, 0); //splash screen bars
 	bcm2835_delay(1000);
 }
@@ -91,8 +94,8 @@ void TestReset(void){
 // Test 9 wide font (NO LOWERCASE)
 // Test 10 tiny font
 // Test 11 homespun font
-// Test 12 bigNums font 7(NUMS ONLY + :)
-// Test 13 medNums font 8 (NUMS ONLY + :)
+// Test 12 bigNums font 7(NUMS ONLY + : )
+// Test 13 medNums font 8 (NUMS ONLY + : )
 // Test 14 test print method 
 // Test 15 Drawtext
 
@@ -100,7 +103,7 @@ void DisplayText()
 {
 
 	myOLED.setTextWrap(true);
-	myOLED.setFontNum(1);
+	myOLED.setFontNum(OLEDFontType_Default);
 	
 	myOLED.OLEDclearBuffer(); // Clear the buffer
 	// Test 1
@@ -256,8 +259,8 @@ void DisplayText()
 	
 	myOLED.setFontNum(OLEDFontType_Mednum);
 	myOLED.setCursor(0, 40);
-	myOLED.print(3.94);
-	myOLED.print(-194);
+	myOLED.print(3.9);
+	myOLED.print(-19);
 	
 	TestReset();
 	
@@ -275,9 +278,9 @@ void DisplayText()
 	
 	// Test 15 drawtext
 	myOLED.setFontNum(OLEDFontType_Tiny);
-	myOLED.drawText(0,0, myString, FOREGROUND, BACKGROUND,1);
+	myOLED.drawText(0,0, myString, WHITE, BLACK,1);
 	myOLED.setFontNum(OLEDFontType_Wide);
-	myOLED.drawText(0,32, myTest, FOREGROUND, BACKGROUND,2);
+	myOLED.drawText(0,32, myTest, WHITE, BLACK,2);
 	TestReset(); 
 	
 } // end  DisplayText()

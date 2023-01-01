@@ -14,7 +14,7 @@
 #include <stdbool.h>
 #include <string.h>
 
-#include "SSD1306_OLED_graphics.h"
+#include "SSD1306_OLED_graphics.hpp"
 
 // ********* DEFINES ********
 // ***********  SSD1306 Command Set  ***********
@@ -64,7 +64,7 @@
 #define SSD1306_COMMAND                     0x00
 #define SSD1306_DATA                        0xC0
 #define SSD1306_DATA_CONTINUE               0x40
-#define SSD1306_ADDR                        0x3C // 0x3D
+#define SSD1306_ADDR                        0x3C // alt 0x3D
 #define SSD1306_command(Reg)  I2C_Write_Byte(Reg, SSD1306_COMMAND)
 #define SSD1306_data(Data)    I2C_Write_Byte(Data, SSD1306_DATA_CONTINUE)
 
@@ -92,7 +92,7 @@ class SSD1306 : public SSD1306_graphics  {
 	void OLEDFillPage(uint8_t page_num, uint8_t pixels,uint8_t delay);
 	void OLEDBitmap(int16_t x, int16_t y, int16_t w, int16_t h, const uint8_t* data, bool invert);
 	
-	void OLEDbegin(uint16_t I2C_speed = 0);
+	void OLEDbegin(uint16_t I2C_speed = 0, uint8_t I2c_address= SSD1306_ADDR );
 	void OLEDinit(void);
 	void OLEDReset(void);
 	void OLEDPowerDown(void);
@@ -114,6 +114,7 @@ class SSD1306 : public SSD1306_graphics  {
 	void OLED_I2C_OFF(void);
 	void OLED_I2C_ON(void);
 	uint16_t _I2C_speed = 0 ;
+	uint8_t _I2C_address = SSD1306_ADDR ;
 	
 	int16_t _OLED_WIDTH;
 	int16_t _OLED_HEIGHT;

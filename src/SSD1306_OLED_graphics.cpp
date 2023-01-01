@@ -6,8 +6,7 @@
 * URL: https://github.com/gavinlyonsrepo/SSD1306_OLED_RPI
 */
 
-#include "SSD1306_OLED_graphics.h"
-#include "SSD1306_OLED.h"
+#include "SSD1306_OLED_graphics.hpp"
 
 
 SSD1306_graphics::SSD1306_graphics(int16_t w, int16_t h):
@@ -323,9 +322,9 @@ size_t SSD1306_graphics::write(uint8_t character)
 		}
 	}else if (_FontNumber == OLEDFontType_Bignum || _FontNumber == OLEDFontType_Mednum)
 	{
-		uint8_t radius = 3;
+		uint8_t decPointRadius = 3;
 		uint8_t SkipSpace = 0;
-		if (_FontNumber == OLEDFontType_Mednum) radius = 2;
+		if (_FontNumber == OLEDFontType_Mednum) decPointRadius = 2;
 		
 		switch (character)
 		{

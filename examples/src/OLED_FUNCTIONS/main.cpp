@@ -12,13 +12,14 @@
 // URL: https://github.com/gavinlyonsrepo/SSD1306_OLED_RPI
 
 #include <bcm2835.h>
-#include "SSD1306_OLED.h"
 #include <time.h>
 #include <stdio.h>
+#include "SSD1306_OLED.hpp"
 
 #define myOLEDwidth  128
 #define myOLEDheight 64
-const uint16_t I2C_Speed = 622; //  bcm2835I2CClockDivider 
+const uint16_t I2C_Speed = 626; //  bcm2835I2CClockDivider 
+const uint8_t I2C_Address = 0x3C;
 SSD1306 myOLED(myOLEDwidth ,myOLEDheight);
 
 // =============== Function prototypes ================
@@ -48,7 +49,7 @@ int main(int argc, char **argv)
 // =============== Functions ================
 void setup()
 {
-	myOLED.OLEDbegin(I2C_Speed); // initialize the OLED
+	myOLED.OLEDbegin(I2C_Speed, I2C_Address); // initialize the OLED
 	myOLED.OLEDFillScreen(0x11, 0); // splash screen
 	myOLED.setTextColor(WHITE);
 	bcm2835_delay(1000);

@@ -11,8 +11,9 @@
 
 #include <stdio.h>
 #include <stdint.h>
-#include "SSD1306_OLED_Print.h"
-#include "SSD1306_OLED_font.h"
+#include <cmath> // for "abs"
+#include "SSD1306_OLED_Print.hpp"
+#include "SSD1306_OLED_font.hpp"
 
 #define swap(a, b) { int16_t t = a; a = b; b = t; }
 

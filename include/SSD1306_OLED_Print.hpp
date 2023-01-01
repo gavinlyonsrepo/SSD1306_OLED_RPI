@@ -14,6 +14,8 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+// Based on Arduino built-in print class Dec 2022 Glyons.
+ 
 #ifndef Print_h
 #define Print_h
 
@@ -21,7 +23,6 @@
 #include <stdio.h> // for size_t
 #include <string.h>
 
-#define PGM_P const char*
 
 #define DEC 10
 #define HEX 16

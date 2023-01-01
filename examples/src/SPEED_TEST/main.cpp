@@ -4,19 +4,22 @@
 // Test file for SSD1306_OLED library, showing fps frame rate per second
 // URL: https://github.com/gavinlyonsrepo/SSD1306_OLED_RPI
 //
-// Test data for test file
-// Fps 7 bcm2835_i2c_set_baudrate(100000);
-// Fps 16 bcm2835_i2c_setClockDivider(BCM2835_I2C_CLOCK_DIVIDER_626);
-// FPS 25 bcm2835_i2c_setClockDivider(BCM2835_I2C_CLOCK_DIVIDER_148);
+// Test  results data for test file
+// I2C_Speed = 0; Fps 7 bcm2835_i2c_set_baudrate(100000) 
+// I2C_Speed = 2500; Fps 6 bcm2835_i2c_setClockDivider(BCM2835_I2C_CLOCK_DIVIDER_2500) 
+// I2C_Speed = 626; Fps 16 bcm2835_i2c_setClockDivider(BCM2835_I2C_CLOCK_DIVIDER_626) 
+// I2C_Speed = 150; Fps 24 bcm2835_i2c_setClockDivider(BCM2835_I2C_CLOCK_DIVIDER_150) 
+// I2C_Speed = 148; FPS 25 bcm2835_i2c_setClockDivider(BCM2835_I2C_CLOCK_DIVIDER_148) 
 
 #include <time.h>
 #include <stdio.h>
 #include <bcm2835.h>
-#include "SSD1306_OLED.h"
+#include "SSD1306_OLED.hpp"
 
 #define myOLEDwidth  128
 #define myOLEDheight 64
-const uint16_t I2C_Speed = 622; //  bcm2835I2CClockDivider 
+const uint16_t I2C_Speed = 626; //  bcm2835I2CClockDivider 
+const uint8_t I2C_Address = 0x3C;
 SSD1306 myOLED(myOLEDwidth ,myOLEDheight) ; // instantiate  an object
 
 // vars for the test
@@ -63,7 +66,7 @@ uint8_t setup()
 	}
 	bcm2835_delay(50);
 	printf("OLED Begin\r\n");
-	myOLED.OLEDbegin(I2C_Speed ); // initialize the OLED
+	myOLED.OLEDbegin(I2C_Speed, I2C_Address); // initialize the OLED
 	myOLED.OLEDFillScreen(0x01, 0); //splash screen bars
 	bcm2835_delay(1500);
 	myOLED.setTextColor(WHITE);
@@ -113,7 +116,7 @@ void display_buffer(long currentFramerate, int count)
 	myOLED.print(fps);
 	myOLED.print(" fps");
 	myOLED.setCursor(0, 50);
-	myOLED.print("V 1.2.0");
+	myOLED.print("V 1.3.0");
 	myOLED.drawFastVLine(64, 0, 63, WHITE);
 
 	myOLED.fillRect(70, 10, 20, 20, colour);

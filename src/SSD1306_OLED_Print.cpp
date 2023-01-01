@@ -24,7 +24,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
-#include "SSD1306_OLED_Print.h"
+#include "SSD1306_OLED_Print.hpp"
 
 // Public Methods //////////////////////////
 

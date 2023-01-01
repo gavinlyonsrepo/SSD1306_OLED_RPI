@@ -4,7 +4,7 @@
 * URL: https://github.com/gavinlyonsrepo/SSD1306_OLED_RPI
 */
 
-#include "SSD1306_OLED.h"
+#include "SSD1306_OLED.hpp"
 #include <stdbool.h>
 
 SSD1306  :: SSD1306(int16_t oledwidth, int16_t oledheight) :SSD1306_graphics(oledwidth, oledheight)
@@ -20,9 +20,11 @@ SSD1306  :: SSD1306(int16_t oledwidth, int16_t oledheight) :SSD1306_graphics(ole
 // Param 1  :: I2C speed default = 0 
 // 0 = //bcm2835_i2c_set_baudrate(100000); //100k baudrate
 // > 0 = BCM2835_I2C_CLOCK_DIVIDER, choices = 2500 , 622 , 150 , 148
-void SSD1306::OLEDbegin( uint16_t I2C_speed )
+// Param 2:: I2C address by default 0x3C
+void SSD1306::OLEDbegin( uint16_t I2C_speed , uint8_t I2c_address)
 {
-	_ I2C_speed = I2C_speed;
+	_I2C_speed = I2C_speed;
+	_I2C_address = I2c_address;
 	OLED_I2C_ON();
 	OLEDinit();
 	OLED_I2C_OFF();
@@ -37,7 +39,7 @@ void SSD1306::OLED_I2C_ON()
 		printf("Error: Cannot start I2C, Running root?\n");
 		return;
 	}
-	bcm2835_i2c_setSlaveAddress(SSD1306_ADDR);  //i2c address
+	bcm2835_i2c_setSlaveAddress(_I2C_address);  //i2c address
 	
 	if ( _I2C_speed > 0)  
 	{
@@ -195,6 +197,7 @@ void SSD1306::OLEDFillPage(uint8_t page_num, uint8_t dataPattern,uint8_t mydelay
 //Param4 height 0-64
 //Param5: pointer to bitmap data
 //Param6: Invert color 
+//Note bitmap data must be  horizontally addressed.
 void SSD1306::OLEDBitmap(int16_t x, int16_t y, int16_t w, int16_t h, const uint8_t* data, bool invert)
 {
 
@@ -226,20 +229,25 @@ for (int16_t j = 0; j < h; j++, y++)
 
 }
 
-// Desc Writes a byte to I2C address,command or reg
-// used internally
+// Desc Writes a byte to I2C address,command or data, used internally
+// In the event of an error will loop 3 times each time.
+// Printing the error code , see bcm2835I2CReasonCodes in bcm2835 docs.
 void SSD1306::I2C_Write_Byte(uint8_t value, uint8_t Cmd)
 {
 	char buf[2] = {Cmd,value};
-	uint8_t returnCode = bcm2835_i2c_write(buf, 2);
 	uint8_t attemptI2Cwrite = 0;
-	while(returnCode  != 0 || attemptCode >= 3)
+	uint8_t returnCode = 0;
+	
+	returnCode = bcm2835_i2c_write(buf, 2); 
+	
+	while(returnCode != 0)
 	{ // failure to write I2C byte 
 		attemptI2Cwrite ++;
 		printf("Error I2C: Cannot Write byte :: %u\n", attemptI2Cwrite);
 		printf("bcm2835I2CReasonCodes :: Error code %u\n", returnCode);
 		returnCode  = bcm2835_i2c_write(buf, 2);
 		bcm2835_delay(100); //mS
+		if (attemptI2Cwrite >= 3) break;
 	}
 }
 
