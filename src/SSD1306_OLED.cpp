@@ -25,7 +25,7 @@ SSD1306  :: SSD1306(int16_t oledwidth, int16_t oledheight) :SSD1306_graphics(ole
 /*!
 	@brief  begin Method initialise OLED
 	@param I2C_speed default = 0 , 0 = bcm2835_i2c_set_baudrate(100000) 100k baudrate,  > 0 = BCM2835_I2C_CLOCK_DIVIDER, choices = 2500 , 622 , 150 , 148
-	@param I2C address by default 0x3C
+	@param I2c_address by default 0x3C
 */
 void SSD1306::OLEDbegin( uint16_t I2C_speed , uint8_t I2c_address)
 {
@@ -85,7 +85,6 @@ void SSD1306::OLEDinit()
  {
 
 	bcm2835_delay(SSD1306_INITDELAY);
-	
 	SSD1306_command( SSD1306_DISPLAY_OFF);
 	SSD1306_command( SSD1306_SET_DISPLAY_CLOCK_DIV_RATIO);
 	SSD1306_command( 0x80);
@@ -194,7 +193,7 @@ void SSD1306::OLEDFillScreen(uint8_t dataPattern, uint8_t delay)
 /*!
 	@brief Fill the chosen page(1-8)  with a datapattern
 	@param page_num chosen page (1-8)
-	@param datapattern can be set to 0 to FF (not buffer)
+	@param dataPattern can be set to 0 to FF (not buffer)
 	@param mydelay optional delay in milliseconds can be set to zero normally.
 */
 void SSD1306::OLEDFillPage(uint8_t page_num, uint8_t dataPattern,uint8_t mydelay)
