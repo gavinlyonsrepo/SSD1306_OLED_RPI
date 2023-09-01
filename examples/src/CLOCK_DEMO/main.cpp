@@ -1,9 +1,13 @@
-// *****************************
-// Example file name : main.cpp
-// Description: Test file showing a "clock demo"
-// URL: https://github.com/gavinlyonsrepo/SSD1306_OLED_RPI
-// *****************************
-
+/*!
+	@file SSD1306_OLED_RPI/examples/src/CLOCK_DEMO/main.cpp
+	@author Gavin Lyons
+	@brief Test file for SSD1306_OLED library, Test file showing a "clock demo" 128X64 screen 
+	
+	Project Name: SSD1306_OLED_RPI
+	
+	@test
+		-# Test 401 Clock Demo
+*/
 
 #include <bcm2835.h>
 #include <time.h>

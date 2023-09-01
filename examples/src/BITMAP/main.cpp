@@ -1,9 +1,15 @@
-// *****************************
-// Example file name : main.cpp
-// Description: Test file showing how to display bitmaps.
-// URL: https://github.com/gavinlyonsrepo/SSD1306_OLED_RPI
-// *****************************
-
+/*!
+	@file SSD1306_OLED_RPI/examples/src/BITMAP/main.cpp
+	@author Gavin Lyons
+	@brief Test file for SSD1306_OLED library, showing how to use  bitmap 128X64 screen 
+	
+	Project Name: SSD1306_OLED_RPI
+	
+	@test
+		-# Test 301 bigImage 64x64 pixels
+		-# Test 302 Small icons 16x8 pixels
+		-# Test 303 full screen image 128x64 pixels 
+*/
 
 #include <bcm2835.h>
 #include <time.h>
@@ -21,9 +27,9 @@ SSD1306 myOLED(myOLEDwidth ,myOLEDheight) ; // instantiate  an object
 // =============== Function prototype ================
 int8_t  setup(void);
 void myLoop(void);
-void Test3(void);
-void Test2(void);
-void Test1(void);
+void Test303(void);
+void Test302(void);
+void Test301(void);
 void EndTests(void);
 
 // ======================= Main ===================
@@ -62,13 +68,13 @@ int8_t setup()
 
 void myLoop()
 {
-	Test1();  
-	Test2();  
-	Test3();  
+	Test301();  
+	Test302();  
+	Test303();  
 }
 
 
-void Test1(void)
+void Test301(void)
 {
 	myOLED.buffer = (uint8_t*) &fullscreenBuffer; // buffer to the pointer
 	myOLED.OLEDBitmap(0, 0 , 64, 64, bigImage, false);
@@ -79,7 +85,7 @@ void Test1(void)
 	myOLED.OLEDclearBuffer();
 }
 
-void Test2(void)
+void Test302(void)
 {
 	myOLED.OLEDBitmap(30, 10, 16, 8, MsgIcon, true);
 	myOLED.OLEDBitmap(70, 10, 16, 8,  SignalIcon, false);
@@ -91,7 +97,7 @@ void Test2(void)
 
 }
 
-void Test3(void)
+void Test303(void)
 {
 	myOLED.OLEDBitmap(0, 0, myOLEDwidth, myOLEDheight, fullscreenBitmap, true);
 	myOLED.OLEDupdate();

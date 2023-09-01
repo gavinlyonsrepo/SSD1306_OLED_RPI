@@ -1,13 +1,13 @@
-/*
-* Project Name: SSD1306_OLED_RPI
-* File: SSD1306_OLED_graphics.h
-* Description: header file for the custom graphics functions
-* Author: Gavin Lyons.
-* URL: https://github.com/gavinlyonsrepo/SSD1306_OLED_RPI
+ /*!
+	@file SSD1306_OLED_graphics.hpp
+	@brief OLED driven by SSD1306 controller. header file
+		for the graphics  based functions.
+	@details Project Name: SSD1306_OLED_RPI
+		URL: https://github.com/gavinlyonsrepo/SSD1306_OLED_RPI
+	@author  Gavin Lyons
 */
 
-#ifndef _SSD1306_OLED_GRAPHICS_H
-#define _SSD1306_OLED_GRAPHICS_H
+#pragma once
 
 #include <stdio.h>
 #include <stdint.h>
@@ -15,15 +15,15 @@
 #include "SSD1306_OLED_Print.hpp"
 #include "SSD1306_OLED_font.hpp"
 
-#define swap(a, b) { int16_t t = a; a = b; b = t; }
+#define swapOLEDRPI(a, b) { int16_t t = a; a = b; b = t; }
 
+/*! @brief Graphics class to hold graphic related functions */
 class SSD1306_graphics : public Print{
 
  public:
 
   SSD1306_graphics(int16_t w, int16_t h); // Constructor
 
-  // This is defined by the subclass:
   virtual void drawPixel(int16_t x, int16_t y, uint8_t color) = 0;
 
   virtual void
@@ -70,20 +70,22 @@ class SSD1306_graphics : public Print{
 	uint8_t getRotation(void) const;
 
  protected:
-  const int16_t
-	WIDTH, HEIGHT;   // This is the 'raw' display w/h - never changes
-  int16_t
-	_width, _height, // Display w/h as modified by current rotation
-	cursor_x, cursor_y;
-	 uint8_t
-	textcolor, textbgcolor;
-	uint8_t textsize;
-	uint8_t rotation;
-	bool wrap; // If set, 'wrap' text at right edge of display
-	uint8_t _FontNumber = 1;
-	uint8_t _CurrentFontWidth = 5;
-	uint8_t _CurrentFontoffset = 0;
-	uint8_t _CurrentFontheight = 8;
-};
+	
+	const int16_t WIDTH;  /**< This is the 'raw' display w - never changes */
+	const int16_t HEIGHT;  /**< This is the 'raw' display h - never changes*/
 
-#endif 
+	int16_t _width;  /**< Display w as modified by current rotation*/
+	int16_t _height;  /**< Display h as modified by current rotation*/
+	int16_t cursor_x; /**< Current X co-ord cursor position */
+	int16_t cursor_y;  /**< Current Y co-ord cursor position */
+
+	uint8_t textcolor;  /**< Text foreground color */
+	uint8_t textbgcolor;   /**< Text background color */
+	uint8_t   textsize = 1; /**< Size of text ,fonts 1-6 */
+	bool wrap;                    /**< If set, 'wrap' text at right edge of display*/
+
+	uint8_t _FontNumber = 1;                /**< Holds current font number */
+	uint8_t _CurrentFontWidth = 5;        /**<Holds current font width in bits */
+	uint8_t _CurrentFontoffset = 0x00;  /**<Holds current font ASCII table offset */
+	uint8_t _CurrentFontheight = 8;      /**<Holds current font height in bits */
+};

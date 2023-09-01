@@ -1,15 +1,23 @@
 
-// Example file name : main.cpp
-// Description:
-// Test file for SSD1306_OLED library, showing fps frame rate per second
-// URL: https://github.com/gavinlyonsrepo/SSD1306_OLED_RPI
-//
-// Test  results data for test file
-// I2C_Speed = 0; Fps 7 bcm2835_i2c_set_baudrate(100000) 
-// I2C_Speed = 2500; Fps 6 bcm2835_i2c_setClockDivider(BCM2835_I2C_CLOCK_DIVIDER_2500) 
-// I2C_Speed = 626; Fps 16 bcm2835_i2c_setClockDivider(BCM2835_I2C_CLOCK_DIVIDER_626) 
-// I2C_Speed = 150; Fps 24 bcm2835_i2c_setClockDivider(BCM2835_I2C_CLOCK_DIVIDER_150) 
-// I2C_Speed = 148; FPS 25 bcm2835_i2c_setClockDivider(BCM2835_I2C_CLOCK_DIVIDER_148) 
+
+/*!
+	@file SSD1306_OLED_RPI/examples/src/SPEED_TEST/main.cpp
+	@author Gavin Lyons
+	@brief Test file for SSD1306_OLED library,  showing fps frame rate per second
+	
+	Project Name: SSD1306_OLED_RPI
+	
+	@test
+		-# Test 601 FPS test frame rate per second
+		
+	@details
+		-# results data for test file
+		-# I2C_Speed = 0 Fps 7 bcm2835_i2c_set_baudrate(100000) 
+		-# I2C_Speed = 2500 Fps 6 bcm2835_i2c_setClockDivider(BCM2835_I2C_CLOCK_DIVIDER_2500) 
+		-# I2C_Speed = 626 Fps 16 bcm2835_i2c_setClockDivider(BCM2835_I2C_CLOCK_DIVIDER_626) 
+		-# I2C_Speed = 150 Fps 24 bcm2835_i2c_setClockDivider(BCM2835_I2C_CLOCK_DIVIDER_150) 
+		-# I2C_Speed = 148 FPS 25 bcm2835_i2c_setClockDivider(BCM2835_I2C_CLOCK_DIVIDER_148) 
+*/
 
 #include <time.h>
 #include <stdio.h>
@@ -116,7 +124,7 @@ void display_buffer(long currentFramerate, int count)
 	myOLED.print(fps);
 	myOLED.print(" fps");
 	myOLED.setCursor(0, 50);
-	myOLED.print("V 1.3.0");
+	myOLED.print("V 1.4.0");
 	myOLED.drawFastVLine(64, 0, 63, WHITE);
 
 	myOLED.fillRect(70, 10, 20, 20, colour);

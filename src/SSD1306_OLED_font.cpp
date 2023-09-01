@@ -1,9 +1,8 @@
-/*
-* Project Name: SSD1306_OLED_RPI
-* File: SSD1306_OLED_font.cpp
-* Description: font data file 
-* Author: Gavin Lyons.
-* URL: https://github.com/gavinlyonsrepo/SSD1306_OLED_RPI
+/*!
+* @file SSD1306_OLED_font.cpp
+* @brief   OLED driven by SSD1306 controller. font data file 8 fonts.
+* @author Gavin Lyons.
+* @details <https://github.com/gavinlyonsrepo/SSD1306_OLED_RPI>
 */
 
 #include "SSD1306_OLED_font.hpp"

@@ -12,3 +12,8 @@
 	* Added ability to change I2C bus speed and address in "begin" method
 	* Added debug messages to I2C write byte method
 	* Large Numerical fonts(7&8) can now display negative sign.
+* version 1.4 Sep 2023
+	* Some code optimisations
+	* string class support added to print
+	* Added Doxygen style comments to create automated API.
+

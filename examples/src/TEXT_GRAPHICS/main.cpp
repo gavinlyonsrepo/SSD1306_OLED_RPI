@@ -1,9 +1,27 @@
-// *****************************
-// Example file name : main.cpp
-// Description:
-// Test file for SSD1306_OLED_RPI library, showing use of TEXT mode & graphics.
-// URL: https://github.com/gavinlyonsrepo/SSD1306_OLED_RPI
-// *****************************
+/*!
+	@file SSD1306_OLED_RPI/examples/src/TEXT_GRAPHICS/main.cpp
+	@author Gavin Lyons
+	@brief Test file for SSD1306_OLED library, showing use of TEXT mode & graphics.
+	
+	Project Name: SSD1306_OLED_RPI
+	
+	@test
+		-# Test 701 Font size 3 float
+		-# Test 702 font size 2 integer
+		-# Test 703 font size 1 string inverted
+		-# Test 704 draw a single character font size 4
+		-# Test 705 print ASCII  font 0-127
+		-# Test 706 print ASCII font 128-255
+		-# Test 707 thick font 2 (NO LOWERCASE)
+		-# Test 708 seven seg font 3
+		-# Test 709 wide font (NO LOWERCASE)
+		-# Test 710 tiny font
+		-# Test 711 homespun font
+		-# Test 712 bigNums font 7(NUMS ONLY + : )
+		-# Test 713 medNums font 8 (NUMS ONLY + : )
+		-# Test 714 test print method 
+		-# Test 715 Drawtext
+*/
 
 #include <bcm2835.h>
 #include <time.h>
@@ -82,22 +100,6 @@ void TestReset(void){
 	myOLED.OLEDclearBuffer();
 }
 
-// DisplayText() : Desc :A series of tests to test the text mode
-// Test 1 Font size 3 float
-// Test 2 font size 2 integer
-// Test 3 font size 1 string inverted
-// Test 4 draw a single character font size 4
-// Test 5 print ASCII  font 0-127
-// Test 6 print ASCII font 128-255
-// Test 7 thick font 2 (NO LOWERCASE)
-// Test 8 seven seg font 3
-// Test 9 wide font (NO LOWERCASE)
-// Test 10 tiny font
-// Test 11 homespun font
-// Test 12 bigNums font 7(NUMS ONLY + : )
-// Test 13 medNums font 8 (NUMS ONLY + : )
-// Test 14 test print method 
-// Test 15 Drawtext
 
 void DisplayText()
 {

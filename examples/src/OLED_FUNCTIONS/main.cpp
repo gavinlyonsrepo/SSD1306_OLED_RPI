@@ -1,15 +1,17 @@
-
-// Example file name : main.cpp
-// Description:
-// Test file for SSD1306_OLED library, showing use of various function
-//
-//  (1) Enable and disable Screen (Sleep mode)
-//  (2) Invert screen color
-//  (3) Contrast screen
-//  (4) Scroll Screen
-//  (5) Rotate 
-//
-// URL: https://github.com/gavinlyonsrepo/SSD1306_OLED_RPI
+/*!
+	@file SSD1306_OLED_RPI/examples/src/OLED_FUNCTIONS/main.cpp
+	@author Gavin Lyons
+	@brief Test file for SSD1306_OLED library, showing use of various function
+	
+	Project Name: SSD1306_OLED_RPI
+	
+	@test
+		-# Test 501 Enable and disable Screen (Sleep mode)
+		-# Test 502 Invert screen color
+		-# Test 503 Contrast screen
+		-# Test 504 Scroll Screen
+		-# Test 505 Rotate
+*/
 
 #include <bcm2835.h>
 #include <time.h>
@@ -67,9 +69,9 @@ void myLoop()
 	myOLED.setTextSize(1);
 
 
-	//  ** Test1 OLED display enable and disable **
+	//  ** Test 501 OLED display enable and disable **
 	myOLED.setCursor(0, 30);
-	myOLED.print("OLED Disable test 1");
+	myOLED.print("Disable test 501");
 	myOLED.OLEDupdate();
 
 	bcm2835_delay(2000); 
@@ -79,9 +81,9 @@ void myLoop()
 	bcm2835_delay(2000); 
 	myOLED.OLEDclearBuffer();
 
-	// ** Test 2 inverse **
+	// ** Test 502 inverse **
 	myOLED.setCursor(0, 10);
-	myOLED.print("OLED Inverse test 2");
+	myOLED.print("Inverse test 502");
 	myOLED.OLEDupdate();
 	bcm2835_delay(1500);
 	myOLED.OLEDInvert(1); // Inverted
@@ -89,10 +91,10 @@ void myLoop()
 	myOLED.OLEDInvert(0);
 	bcm2835_delay(1500);
 
-	// ** Test 3 contrast **
+	// ** Test 503 contrast **
 	myOLED.OLEDclearBuffer();
 	myOLED.setCursor(0, 0);
-	myOLED.print("Contrast test 3");
+	myOLED.print("Contrast test 503");
 	myOLED.OLEDupdate();
 	bcm2835_delay(1500);
 	myOLED.OLEDFillScreen(0x77, 0); 
@@ -106,9 +108,9 @@ void myLoop()
 	bcm2835_delay(1000);
 	myOLED.OLEDclearBuffer();
 
-	// ***** Test 4 Scroll **
+	// ***** Test 504 Scroll **
 	myOLED.setCursor(20,20 );
-	myOLED.print("scroll test 4");
+	myOLED.print("scroll test 504");
 	myOLED.OLEDupdate();
 	bcm2835_delay(2500);
 
@@ -129,7 +131,7 @@ void myLoop()
 	myOLED.OLED_StopScroll();
  	
  	
- 	// ** Test 5 rotate test **
+ 	// ** Test 505 rotate test **
  	
  	myOLED.OLEDclearBuffer();
  	

@@ -1,14 +1,17 @@
-/*
-* Project Name: SSD1306_OLED
-* File:SSD1306_OLED_graphics.cpp
-* Description: header file for the  graphics functions
-* Author: Gavin Lyons.
-* URL: https://github.com/gavinlyonsrepo/SSD1306_OLED_RPI
+/*!
+* @file SSD1306_OLED_graphics.cpp
+* @brief  OLED driven by SSD1306 controller. , header file for the  graphics functions
+*  @author Gavin Lyons.
+* @details https://github.com/gavinlyonsrepo/SSD1306_OLED_RPI
 */
 
 #include "SSD1306_OLED_graphics.hpp"
 
-
+/*!
+	@brief init the OLED  Graphics class object
+	@param w width defined  in sub-class
+	@param h height defined in sub-class
+ */
 SSD1306_graphics::SSD1306_graphics(int16_t w, int16_t h):
 	WIDTH(w), HEIGHT(h)
 {
@@ -21,7 +24,13 @@ SSD1306_graphics::SSD1306_graphics(int16_t w, int16_t h):
 	wrap      = true;
 }
 
-// Draw a circle outline
+/*!
+	@brief draws a circle where (x0,y0) are center coordinates an r is circle radius.
+	@param x0 circle center x position
+	@param y0 circle center y position
+	@param r radius of circle
+	@param color The color of the circle
+*/
 void SSD1306_graphics::drawCircle(int16_t x0, int16_t y0, int16_t r,
 	uint8_t color) {
 	int16_t f = 1 - r;
@@ -56,6 +65,9 @@ void SSD1306_graphics::drawCircle(int16_t x0, int16_t y0, int16_t r,
 	}
 }
 
+/*!
+	@brief Used internally by drawRoundRect
+*/
 void SSD1306_graphics::drawCircleHelper( int16_t x0, int16_t y0,
 				 int16_t r, uint8_t cornername, uint8_t color) {
 	int16_t f     = 1 - r;
@@ -92,13 +104,22 @@ void SSD1306_graphics::drawCircleHelper( int16_t x0, int16_t y0,
 	}
 }
 
+/*!
+	@brief fills a circle where (x0,y0) are center coordinates an r is circle radius.
+	@param x0 circle center x position
+	@param y0 circle center y position
+	@param r radius of circle
+	@param color color of the filled circle 
+*/
 void SSD1306_graphics::fillCircle(int16_t x0, int16_t y0, int16_t r,
 					uint8_t color) {
 	drawFastVLine(x0, y0-r, 2*r+1, color);
 	fillCircleHelper(x0, y0, r, 3, 0, color);
 }
 
-// Used to do circles and roundrects
+/*!
+	@brief Used internally by fill circle fillRoundRect and fillcircle
+*/
 void SSD1306_graphics::fillCircleHelper(int16_t x0, int16_t y0, int16_t r,
 	uint8_t cornername, int16_t delta, uint8_t color) {
 
@@ -129,19 +150,26 @@ void SSD1306_graphics::fillCircleHelper(int16_t x0, int16_t y0, int16_t r,
 	}
 }
 
-
+/*!
+	@brief draws a line from (x0,y0) to (x1,y1).
+	@param x0 x start coordinate
+	@param y0 y start coordinate
+	@param x1 x end coordinate
+	@param y1 y end coordinate
+	@param color color to draw line
+*/
 void SSD1306_graphics::drawLine(int16_t x0, int16_t y0,
 				int16_t x1, int16_t y1,
 				uint8_t color) {
 	int16_t steep = abs(y1 - y0) > abs(x1 - x0);
 	if (steep) {
-	swap(x0, y0);
-	swap(x1, y1);
+	swapOLEDRPI(x0, y0);
+	swapOLEDRPI(x1, y1);
 	}
 
 	if (x0 > x1) {
-	swap(x0, x1);
-	swap(y0, y1);
+	swapOLEDRPI(x0, x1);
+	swapOLEDRPI(y0, y1);
 	}
 
 	int16_t dx, dy;
@@ -171,7 +199,14 @@ void SSD1306_graphics::drawLine(int16_t x0, int16_t y0,
 	}
 }
 
-// Draw a rectangle
+/*!
+	@brief draws rectangle at (x,y) where h is height and w is width of the rectangle.
+	@param x x start coordinate
+	@param y y start coordinate
+	@param w width of the rectangle
+	@param h height of the rectangle
+	@param color color to draw  rect
+*/
 void SSD1306_graphics::drawRect(int16_t x, int16_t y,
 				int16_t w, int16_t h,
 				uint8_t color) {
@@ -181,16 +216,39 @@ void SSD1306_graphics::drawRect(int16_t x, int16_t y,
 	drawFastVLine(x+w-1, y, h, color);
 }
 
+
+/*!
+	@brief Draws a vertical line starting at (x,y) with height h.
+	@param x The starting x coordinate
+	@param y The starting y coordinate
+	@param h The height of the line
+	@param color The color of the line
+*/
 void SSD1306_graphics::drawFastVLine(int16_t x, int16_t y,
 				 int16_t h, uint8_t color) {
 	drawLine(x, y, x, y+h-1, color);
 }
 
+/*!
+	@brief Draws a horizontal line starting at (x,y) with width w.
+	@param x The starting x coordinate
+	@param y The starting y coordinate
+	@param w The width of the line
+	@param color The color of the line 
+*/
 void SSD1306_graphics::drawFastHLine(int16_t x, int16_t y,
 				 int16_t w, uint8_t color) {
 		drawLine(x, y, x+w-1, y, color);
 }
 
+/*!
+	@brief fills a rectangle starting from coordinates (x,y) with width of w and height of h.
+	@param x x coordinate
+	@param y y coordinate
+	@param w width of the rectangle
+	@param h height of the rectangle
+	@param color color to fill  rectangle 
+*/
 void SSD1306_graphics::fillRect(int16_t x, int16_t y, int16_t w, int16_t h,
 				uint8_t color) {
 	for (int16_t i=x; i<x+w; i++) {
@@ -198,11 +256,23 @@ void SSD1306_graphics::fillRect(int16_t x, int16_t y, int16_t w, int16_t h,
 	}
 }
 
+/*!
+	@brief Fills the whole screen with a given color.
+	@param  color color to fill screen
+*/
 void SSD1306_graphics::fillScreen(uint8_t color) {
 	fillRect(0, 0, _width, _height, color);
 }
 
-// Draw a rounded rectangle
+/*!
+	@brief draws a rectangle with rounded edges
+	@param x x start coordinate
+	@param y y start coordinate
+	@param w width of the rectangle
+	@param h height of the rectangle
+	@param r radius of the rounded edges
+	@param color color to draw rounded rectangle 
+*/
 void SSD1306_graphics::drawRoundRect(int16_t x, int16_t y, int16_t w,
 	int16_t h, int16_t r, uint8_t color) {
 	drawFastHLine(x+r  , y    , w-2*r, color); // Top
@@ -216,7 +286,16 @@ void SSD1306_graphics::drawRoundRect(int16_t x, int16_t y, int16_t w,
 	drawCircleHelper(x+r    , y+h-r-1, r, 8, color);
 }
 
-// Fill a rounded rectangle
+/*!
+	@brief Fills a rectangle with rounded edges
+	@param x x start coordinate
+	@param y y start coordinate
+	@param w width of the rectangle
+	@param h height of the rectangle
+	@param r  radius of the rounded edges
+	@param color color to fill round  rectangle 
+*/
+vo
 void SSD1306_graphics::fillRoundRect(int16_t x, int16_t y, int16_t w,
 				 int16_t h, int16_t r, uint8_t color) {
 	// smarter version
@@ -227,7 +306,16 @@ void SSD1306_graphics::fillRoundRect(int16_t x, int16_t y, int16_t w,
 	fillCircleHelper(x+r    , y+r, r, 2, h-2*r-1, color);
 }
 
-// Draw a triangle
+/*!
+	@brief draws a triangle of coordinates (x0,y0), (x1,y1) and (x2,y2).
+	@param x0 x start coordinate point 1
+	@param y0 y start coordinate point 1
+	@param x1 x start coordinate point 2
+	@param y1 y start coordinate point 2
+	@param x2 x start coordinate point 3
+	@param y2 y start coordinate point 3
+	@param color color to draw triangle 
+*/
 void SSD1306_graphics::drawTriangle(int16_t x0, int16_t y0,
 				int16_t x1, int16_t y1,
 				int16_t x2, int16_t y2, uint8_t color) {
@@ -236,22 +324,30 @@ void SSD1306_graphics::drawTriangle(int16_t x0, int16_t y0,
 	drawLine(x2, y2, x0, y0, color);
 }
 
-// Fill a triangle
+/*!
+	@brief Fills a triangle of coordinates (x0,y0), (x1,y1) and (x2,y2).
+	@param x0 x start coordinate point 1
+	@param y0 y start coordinate point 1
+	@param x1 x start coordinate point 2
+	@param y1 y start coordinate point 2
+	@param x2 x start coordinate point 3
+	@param y2 y start coordinate point 3
+	@param color color to fill  triangle
+*/
 void SSD1306_graphics::fillTriangle ( int16_t x0, int16_t y0,
 					int16_t x1, int16_t y1,
 					int16_t x2, int16_t y2, uint8_t color) {
 
 	int16_t a, b, y, last;
 
-	// Sort coordinates by Y order (y2 >= y1 >= y0)
 	if (y0 > y1) {
-	swap(y0, y1); swap(x0, x1);
+	swapOLEDRPI(y0, y1); swapOLEDRPI(x0, x1);
 	}
 	if (y1 > y2) {
-	swap(y2, y1); swap(x2, x1);
+	swapOLEDRPI(y2, y1); swapOLEDRPI(x2, x1);
 	}
 	if (y0 > y1) {
-	swap(y0, y1); swap(x0, x1);
+	swapOLEDRPI(y0, y1); swapOLEDRPI(x0, x1);
 	}
 
 	if(y0 == y2) { 
@@ -275,8 +371,8 @@ void SSD1306_graphics::fillTriangle ( int16_t x0, int16_t y0,
 	sa   = 0,
 	sb   = 0;
 
-	if(y1 == y2) last = y1;   // Include y1 scanline
-	else         last = y1-1; // Skip it
+	if(y1 == y2) last = y1;   
+	else         last = y1-1; 
 
 	for(y=y0; y<=last; y++) {
 	a   = x0 + sa / dy01;
@@ -284,7 +380,7 @@ void SSD1306_graphics::fillTriangle ( int16_t x0, int16_t y0,
 	sa += dx01;
 	sb += dx02;
 
-	if(a > b) swap(a,b);
+	if(a > b) swapOLEDRPI(a,b);
 	drawFastHLine(a, y, b-a+1, color);
 	}
 
@@ -296,13 +392,16 @@ void SSD1306_graphics::fillTriangle ( int16_t x0, int16_t y0,
 	b   = x0 + sb / dy02;
 	sa += dx12;
 	sb += dx02;
-	if(a > b) swap(a,b);
+	if(a > b) swapOLEDRPI(a,b);
 	drawFastHLine(a, y, b-a+1, color);
 	}
 }
 
-// Desc called form the print class by print functions
-// to draw most data types using polymorphism
+/*!
+	@brief called by the print class after it converts the data to a character
+	@param character 
+	@note draw most data types using polymorphism
+*/
 size_t SSD1306_graphics::write(uint8_t character) 
 {
 	if (_FontNumber < OLEDFontType_Bignum)
@@ -360,13 +459,16 @@ size_t SSD1306_graphics::write(uint8_t character)
   return 1;
 }
 
-// Desc: writes a char (c) on the OLED
-// Param 1 , 2 : coordinates (x, y).
-// Param 3: The ASCII character
-// Param 4: color 
-// Param 5: background color
-// Param 6: size 1  to  max
-// Note Font 1-6 only
+/*!
+	@brief  writes a char (c) on the OLED
+	@param  x X coordinate
+	@param  y Y coordinate
+	@param  c The ASCII character
+	@param color  color
+	@param bg background color
+	@param size 1-x
+	@note for font #1-6 only
+*/
 void SSD1306_graphics::drawChar(int16_t x, int16_t y, unsigned char c,
 				uint8_t color, uint8_t bg, uint8_t size) {
 
@@ -420,40 +522,78 @@ void SSD1306_graphics::drawChar(int16_t x, int16_t y, unsigned char c,
 	}
 }
 
+/*! 
+	@brief set the cursor position  
+	@param x X co-ord position 
+	@param y Y co-ord position
+*/
 void SSD1306_graphics::setCursor(int16_t x, int16_t y) {
 	cursor_x = x;
 	cursor_y = y;
 }
 
+/*! 
+	@brief set the text size , starts at 1 
+	@param s Size of text 1-X 
+*/
 void SSD1306_graphics::setTextSize(uint8_t s) {
 	textsize = (s > 0) ? s : 1;
 }
 
+/*! 
+	@brief set the text color  
+	@param c Color fo text 
+*/
 void SSD1306_graphics::setTextColor(uint8_t c) {
 	textcolor = textbgcolor = c;
 }
 
+/*! 
+	@brief set the text color  
+	@param c Color of text foreground
+	@param b color of background of text 
+*/
 void SSD1306_graphics::setTextColor(uint8_t c, uint8_t b) {
 	textcolor   = c;
 	textbgcolor = b; 
 }
 
+/*!
+	@brief turn on or off screen wrap of the text (fonts 1-6)
+	@param w TRUE on
+*/
 void SSD1306_graphics::setTextWrap(bool w) {
 	wrap = w;
 }
 
+/*!
+	@brief Gets the width of the display (per current rotation)
+	@return width member of display in pixels 
+*/
 int16_t SSD1306_graphics::width(void) const {
 	return _width;
 }
  
+/*!
+	@brief Gets the height of the display (per current rotation)
+	@return height member of display in pixels 
+*/
 int16_t SSD1306_graphics::height(void) const {
 	return _height;
 }
 
+ /*!
+	@brief Gets the rotation of the display 
+	@return rotation value 0-3
+*/
 uint8_t SSD1306_graphics::getRotation(void) const {
 	return rotation;
 }
 
+ /*!
+	@brief Sets the rotation of the display 
+	@param x rotation value 0-3
+*/
 void SSD1306_graphics::setRotation(uint8_t x) {
 	rotation = (x & 3);
 	switch(rotation) {
@@ -471,11 +611,11 @@ void SSD1306_graphics::setRotation(uint8_t x) {
 }
 
 
-// Desc :  Set the font number
-// Param1: OLEDFontType_e  enum , fontnumber 1-8 
-// 1=default 2=thick 3=seven segment 4=wide 5=tiny 6=homespun
-// 7= bignum 8=mednum
-
+/*!
+	@brief   Set the current font type
+	@param FontNumber 1-8 enum OLEDFontType_e
+	@note 1=default 2=thick 3=seven segment 4=wide 5=tiny 6=homespun 7=bignums 8=mednums
+*/
 void SSD1306_graphics::setFontNum(OLEDFontType_e FontNumber) 
 {
 	_FontNumber = FontNumber;
@@ -530,13 +670,15 @@ void SSD1306_graphics::setFontNum(OLEDFontType_e FontNumber)
     }
 }
 
-// Desc: writes a char (c) on the OLED
-// Param 1 , 2 : coordinates (x, y).
-// Param 3: The ASCII character
-// Param 4: color 
-// Param 5: background color
-// Notes for font 7 , 8 only
-
+/*!
+	@brief writes a char (c) on the OLED
+	@param x X coordinate
+	@param y Y coordinate
+	@param c The ASCII character
+	@param color 
+	@param bg background color
+	@note for font 7,8 only
+*/
 void SSD1306_graphics::drawCharNumFont(uint8_t x, uint8_t y, uint8_t c, uint8_t color , uint8_t bg) 
 {
 	if (_FontNumber < OLEDFontType_Bignum)
@@ -579,13 +721,15 @@ void SSD1306_graphics::drawCharNumFont(uint8_t x, uint8_t y, uint8_t c, uint8_t 
 	}
 }
 
-// Desc: Writes text string (*ptext) on the OLED
-// Param 1 , 2 : coordinates (x, y).
-// Param 3: pointer to string 
-// Param 4: color 
-// Param 5: background color
-// Notes for font 7-8 only 
-
+/*!
+	@brief Writes text string (*ptext) on the OLED
+	@param x X coordinate
+	@param y Y coordinate
+	@param pText pointer to string of ASCII character's
+	@param color text color
+	@param bg background color
+	@note for font 7,8 only
+*/
 void SSD1306_graphics::drawTextNumFont(uint8_t x, uint8_t y, 
 						char *pText, uint8_t color, uint8_t bg) 
 {
@@ -611,12 +755,17 @@ void SSD1306_graphics::drawTextNumFont(uint8_t x, uint8_t y,
 	}
 }
 
-// Desc: Writes text string (*ptext) on the OLED
-// Param 1 , 2 : coordinates (x, y).
-// Param 3: pointer to string 
-// Param 4: color 
-// Param 5: background color
-// Notes for font 1- 6 only
+
+/*!
+	@brief Writes text string on the OLED
+	@param x X coordinate
+	@param y Y coordinate
+	@param pText pointer to string/array
+	@param color text color
+	@param bg background color
+	@param size 1-x
+	@note for font #1-6 only
+*/
 void SSD1306_graphics::drawText(uint8_t x, uint8_t y, char *pText, uint8_t color, uint8_t bg, uint8_t size) 
 {
 	if (_FontNumber >= OLEDFontType_Bignum)

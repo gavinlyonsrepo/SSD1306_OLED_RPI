@@ -1,10 +1,13 @@
-// *****************************
-// Example file name : main.cpp
-// Description:
-// Test file SSD1306_OLED lib, showing hello world for a 128by32 screen
-// URL: https://github.com/gavinlyonsrepo/SSD1306_OLED_RPI
-// *****************************
-
+/*!
+	@file SSD1306_OLED_RPI/examples/src/HELLO_WORLD_128_32/main.cpp
+	@author Gavin Lyons
+	@brief Test file for SSD1306_OLED library, showing  "hello world" basic use case for a 128by32 screen
+	
+	Project Name: SSD1306_OLED_RPI
+	
+	@test
+		1. Test 200 Hello World 128by32 screen
+*/
 #include <bcm2835.h>
 #include <time.h>
 #include <stdio.h>

@@ -1,12 +1,18 @@
-/*
-* Project Name: SSD1306_OLED_RPI
-* Author: Gavin Lyons.
-* URL: https://github.com/gavinlyonsrepo/SSD1306_OLED_RPI
+/*!
+* @file SSD1306_OLED.cpp
+* @brief   OLED driven by SSD1306 controller, Source file
+* @author Gavin Lyons.
+* @details <https://github.com/gavinlyonsrepo/SSD1306_OLED_RPI>
 */
 
 #include "SSD1306_OLED.hpp"
 #include <stdbool.h>
 
+/*!
+	@brief init the screen object
+	@param oledwidth width of OLED in pixels 
+	@param oledwidth height of OLED in pixels 
+ */
 SSD1306  :: SSD1306(int16_t oledwidth, int16_t oledheight) :SSD1306_graphics(oledwidth, oledheight)
 {
 	_OLED_HEIGHT = oledheight;
@@ -16,11 +22,11 @@ SSD1306  :: SSD1306(int16_t oledwidth, int16_t oledheight) :SSD1306_graphics(ole
 	bufferHeight = _OLED_HEIGHT;
 }
 
-// Desc: begin Method initialise OLED
-// Param 1  :: I2C speed default = 0 
-// 0 = //bcm2835_i2c_set_baudrate(100000); //100k baudrate
-// > 0 = BCM2835_I2C_CLOCK_DIVIDER, choices = 2500 , 622 , 150 , 148
-// Param 2:: I2C address by default 0x3C
+/*!
+	@brief  begin Method initialise OLED
+	@param I2C_speed default = 0 , 0 = bcm2835_i2c_set_baudrate(100000) 100k baudrate,  > 0 = BCM2835_I2C_CLOCK_DIVIDER, choices = 2500 , 622 , 150 , 148
+	@param I2C address by default 0x3C
+*/
 void SSD1306::OLEDbegin( uint16_t I2C_speed , uint8_t I2c_address)
 {
 	_I2C_speed = I2C_speed;
@@ -30,10 +36,12 @@ void SSD1306::OLEDbegin( uint16_t I2C_speed , uint8_t I2c_address)
 	OLED_I2C_OFF();
 }
 
+/*!
+	@brief  Start I2C operations. Forces RPi I2C pins P1-03 (SDA) and P1-05 (SCL) 
+	to alternate function ALT0, which enables those pins for I2C interface. 
+*/
 void SSD1306::OLED_I2C_ON()
 {
-	// Start I2C operations. Forces RPi I2C pins P1-03 (SDA) and P1-05 (SCL) 
-	// to alternate function ALT0, which enables those pins for I2C interface. 
 	if (!bcm2835_i2c_begin())
 	{
 		printf("Error: Cannot start I2C, Running root?\n");
@@ -52,22 +60,27 @@ void SSD1306::OLED_I2C_ON()
 	}
 }
 
-// Desc: End I2C operations. 
-// I2C pins P1-03 (SDA) and P1-05 (SCL) 
-// are returned to their default INPUT behaviour. 
+/*!
+	@brief End I2C operations. I2C pins P1-03 (SDA) and P1-05 (SCL) 	
+	are returned to their default INPUT behaviour. 
+*/
 void SSD1306::OLED_I2C_OFF(void)
 {
 	bcm2835_i2c_end();
 }
 
-// Call when powering down
+/*! 
+	@brief Disables  OLED Call when powering down
+*/
 void SSD1306::OLEDPowerDown(void)
 {
 	OLEDEnable(0);
 	bcm2835_delay(100);
 }
 
-// Desc: Called from OLEDbegin carries out Power on sequence and register init
+/*!
+	@brief Called from OLEDbegin carries out Power on sequence and register init
+*/
 void SSD1306::OLEDinit()
  {
 
@@ -122,8 +135,10 @@ switch (_OLED_HEIGHT)
 	bcm2835_delay(SSD1306_INITDELAY);
 }
 
-// Desc: Turns On Display
-// Param1: bits,  1  on , 0 off
+/*!
+	@brief Turns On Display
+	@param bits   1  on , 0 off
+*/
 void SSD1306::OLEDEnable(uint8_t bits)
 {
 	OLED_I2C_ON();
@@ -131,8 +146,10 @@ void SSD1306::OLEDEnable(uint8_t bits)
 	OLED_I2C_OFF();
 }
 
-// Desc: Adjusts contrast
-// Param1: Contrast 0x00 to 0xFF , default 0x80
+/*!
+	@brief Adjusts contrast
+	@param contrast 0x00 to 0xFF , default 0x80
+*/
 void SSD1306::OLEDContrast(uint8_t contrast)
 {
 	OLED_I2C_ON();
@@ -141,9 +158,10 @@ void SSD1306::OLEDContrast(uint8_t contrast)
 	OLED_I2C_OFF();
 }
 
-
-// Desc: invert the display
-// Param1: true invert , false normal
+/*!
+	@brief invert the display
+	@param value true invert , false normal
+*/
 void SSD1306::OLEDInvert(bool value)
 {
  OLED_I2C_ON();
@@ -151,9 +169,11 @@ void SSD1306::OLEDInvert(bool value)
  OLED_I2C_OFF();
 }
 
-// Desc: Fill the screen NOT the buffer with a datapattern
-// Param1: datapattern can be set to zero to clear screen (not buffer) range 0x00 to 0ff
-// Param2: optional delay in milliseconds can be set to zero normally.
+/*!
+	@brief Fill the screen NOT the buffer with a datapattern
+	@param dataPattern can be set to zero to clear screen (not buffer) range 0x00 to 0ff
+	@param delay in milliseconds can be set to zero normally.
+*/
 void SSD1306::OLEDFillScreen(uint8_t dataPattern, uint8_t delay)
 {
 	OLED_I2C_ON();
@@ -171,9 +191,12 @@ void SSD1306::OLEDFillScreen(uint8_t dataPattern, uint8_t delay)
 	OLED_I2C_OFF();
 }
 
-// Desc: Fill the chosen page(1-8)  with a datapattern
-// Param1: datapattern can be set to 0 to FF (not buffer)
-// Param2: optional delay in milliseconds can be set to zero normally.
+/*!
+	@brief Fill the chosen page(1-8)  with a datapattern
+	@param page_num chosen page (1-8)
+	@param datapattern can be set to 0 to FF (not buffer)
+	@param mydelay optional delay in milliseconds can be set to zero normally.
+*/
 void SSD1306::OLEDFillPage(uint8_t page_num, uint8_t dataPattern,uint8_t mydelay)
 {
 	OLED_I2C_ON();
@@ -190,14 +213,16 @@ void SSD1306::OLEDFillPage(uint8_t page_num, uint8_t dataPattern,uint8_t mydelay
 	OLED_I2C_OFF();
 }
 
-//Desc: Draw a bitmap  to the screen
-//Param1: x offset 0-128
-//Param2: y offset 0-64
-//Param3: width 0-128
-//Param4 height 0-64
-//Param5: pointer to bitmap data
-//Param6: Invert color 
-//Note bitmap data must be  horizontally addressed.
+/*!
+	@brief Draw a bitmap  to the buffer 
+	@param x x axis offset 0-128
+	@param y y axis offset 0-64
+	@param w width 0-128
+	@param h height 0-64
+	@param data pointer to bitmap data
+	@param invert color 
+	@note bitmap data must be  horizontally addressed.
+*/
 void SSD1306::OLEDBitmap(int16_t x, int16_t y, int16_t w, int16_t h, const uint8_t* data, bool invert)
 {
 
@@ -229,12 +254,16 @@ for (int16_t j = 0; j < h; j++, y++)
 
 }
 
-// Desc Writes a byte to I2C address,command or data, used internally
-// In the event of an error will loop 3 times each time.
-// Printing the error code , see bcm2835I2CReasonCodes in bcm2835 docs.
-void SSD1306::I2C_Write_Byte(uint8_t value, uint8_t Cmd)
+/*!
+	@brief Writes a byte to I2C address,command or data, used internally
+	@param value write the value to be written
+	@param cmd command or data
+	@note In the event of an error will loop 3 times each time.
+	Printing the error code , see bcm2835I2CReasonCodes in bcm2835 docs.
+*/
+void SSD1306::I2C_Write_Byte(uint8_t value, uint8_t cmd)
 {
-	char buf[2] = {Cmd,value};
+	char buf[2] = {cmd,value};
 	uint8_t attemptI2Cwrite = 0;
 	uint8_t returnCode = 0;
 	
@@ -246,19 +275,23 @@ void SSD1306::I2C_Write_Byte(uint8_t value, uint8_t Cmd)
 		printf("Error I2C: Cannot Write byte :: %u\n", attemptI2Cwrite);
 		printf("bcm2835I2CReasonCodes :: Error code %u\n", returnCode);
 		returnCode  = bcm2835_i2c_write(buf, 2);
-		bcm2835_delay(100); //mS
+		bcm2835_delay(100); // mS
 		if (attemptI2Cwrite >= 3) break;
 	}
 }
 
-//Desc: updates the buffer i.e. writes it to the screen
+/*!
+	@brief updates the buffer i.e. writes it to the screen
+*/
 void SSD1306::OLEDupdate()
 {
 	uint8_t x = 0; uint8_t y = 0; uint8_t w = this->bufferWidth; uint8_t h = this->bufferHeight;
 	OLEDBuffer( x,  y,  w,  h, (uint8_t*) this->buffer);
 }
 
-//Desc: clears the buffer memory i.e. does NOT write to the screen
+/*!
+	@brief clears the buffer memory i.e. does NOT write to the screen
+*/
 void SSD1306::OLEDclearBuffer()
 {
 
@@ -266,13 +299,15 @@ void SSD1306::OLEDclearBuffer()
 
 }
 
-//Desc: Draw a bitmap to the screen
-//Param1: x offset 0-128
-//Param2: y offset 0-64
-//Param3: width 0-128
-//Param4 height 0-64
-//Param5 the buffer data
-//Note: Called by OLEDupdate
+/*!
+	@brief Draw a bitmap directly to the screen
+	@param x x axis  offset 0-128
+	@param y y axis offset 0-64
+	@param w width 0-128
+	@param h height 0-64
+	@param data the buffer data
+	@note Called by OLEDupdate internally 
+*/
 void SSD1306::OLEDBuffer(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t* data)
 {
 	OLED_I2C_ON();
@@ -308,8 +343,12 @@ void SSD1306::OLEDBuffer(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t* da
 
 }
 
-// Desc: Draws a Pixel to the screen overides the gfx lib if defined
-// Passed x and y co-ords and colour of pixel.
+/*!
+	@brief Draws a Pixel to the screen overides the gfx lib if defined
+	@param x x axis  position  
+	@param y y axis  position
+	@param color color of pixel.
+*/
 void SSD1306::drawPixel(int16_t x, int16_t y, uint8_t color)
 {
 
@@ -342,7 +381,11 @@ void SSD1306::drawPixel(int16_t x, int16_t y, uint8_t color)
 		}
 }
 
-
+/*!
+	@brief Scroll OLED data to the right
+	@param start start position
+	@param stop stop position 
+*/
 void SSD1306::OLED_StartScrollRight(uint8_t start, uint8_t stop) 
 {
 	OLED_I2C_ON();
@@ -357,6 +400,11 @@ void SSD1306::OLED_StartScrollRight(uint8_t start, uint8_t stop)
 	OLED_I2C_OFF();
 }
 
+/*!
+	@brief Scroll OLED data to the left
+	@param start start position
+	@param stop stop position 
+*/
 void SSD1306::OLED_StartScrollLeft(uint8_t start, uint8_t stop) 
 {
 	OLED_I2C_ON();
@@ -371,6 +419,11 @@ void SSD1306::OLED_StartScrollLeft(uint8_t start, uint8_t stop)
 	OLED_I2C_OFF();
 }
 
+/*!
+	@brief Scroll OLED data diagonally to the right
+	@param start start position
+	@param stop stop position 
+*/
 void SSD1306::OLED_StartScrollDiagRight(uint8_t start, uint8_t stop) 
 {
 	OLED_I2C_ON();
@@ -387,6 +440,11 @@ void SSD1306::OLED_StartScrollDiagRight(uint8_t start, uint8_t stop)
 	OLED_I2C_OFF();
 }
 
+/*!
+	@brief Scroll OLED data diagonally to the left
+	@param start start position
+	@param stop stop position 
+*/
 void SSD1306::OLED_StartScrollDiagLeft(uint8_t start, uint8_t stop) 
 {
 	OLED_I2C_ON();
@@ -403,6 +461,9 @@ void SSD1306::OLED_StartScrollDiagLeft(uint8_t start, uint8_t stop)
 	OLED_I2C_OFF();
 }
 
+/*!
+	@brief  Stop scroll mode
+*/
 void SSD1306::OLED_StopScroll(void) 
 {
 	OLED_I2C_ON();
@@ -411,4 +472,4 @@ void SSD1306::OLED_StopScroll(void)
 }
 
 
-// ********************  EOF  *************
+// ---  EOF ---

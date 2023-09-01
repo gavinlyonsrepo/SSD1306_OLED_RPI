@@ -1,10 +1,13 @@
-// *****************************
-// Example file name : main.cpp
-// Description:
-// Test file for SSD1306_OLED library, showing  "hello world" basic use case
-// URL: https://github.com/gavinlyonsrepo/SSD1306_OLED_RPI
-// *****************************
-
+/*!
+	@file SSD1306_OLED_RPI/examples/src/HELLO_WORLD/main.cpp
+	@author Gavin Lyons
+	@brief Test file for SSD1306_OLED library, showing  "hello world" basic use case
+	
+	Project Name: SSD1306_OLED_RPI
+	
+	@test
+		1. Test 100 Hello World
+*/
 
 #include <bcm2835.h>
 #include <time.h>
