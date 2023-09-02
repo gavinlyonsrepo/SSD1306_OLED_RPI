@@ -1,9 +1,7 @@
 /*!
 	@file     SSD1306_OLED_Print.cpp
 	@brief   Base class that provides print() and println() for SSD1306_OLEDRPI library
-
 	@note  Port of arduino built-in print class, G Lyons 2022.
-
 */
 
 #include <stdlib.h>

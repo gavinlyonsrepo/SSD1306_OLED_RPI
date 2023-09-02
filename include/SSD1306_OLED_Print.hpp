@@ -1,9 +1,7 @@
 /*!
 	@file     SSD1306_OLED_Print.hpp
 	@brief    Base class that provides print() and println() for SSD1306_OLED_RPI library
-
 	@note  Port of arduino built-in print class, G Lyons 2022.
-		
 */
  
 #pragma once

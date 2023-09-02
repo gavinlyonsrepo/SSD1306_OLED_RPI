@@ -19,7 +19,7 @@
 
 #define myOLEDwidth  128
 #define myOLEDheight 64
-uint8_t fullscreenBuffer[1024]; // buffer
+uint8_t fullscreenBuffer[1024]; // buffer 128 * 64/8
 const uint16_t I2C_Speed = 626; //  bcm2835I2CClockDivider, see readme
 const uint8_t I2C_Address = 0x3C;
 SSD1306 myOLED(myOLEDwidth ,myOLEDheight) ; // instantiate  an object
@@ -76,6 +76,7 @@ void myLoop()
 
 void Test301(void)
 {
+	printf("OLED Test 301 64x64 pixel Image\r\n");
 	myOLED.buffer = (uint8_t*) &fullscreenBuffer; // buffer to the pointer
 	myOLED.OLEDBitmap(0, 0 , 64, 64, bigImage, false);
 	myOLED.OLEDupdate();
@@ -87,7 +88,7 @@ void Test301(void)
 
 void Test302(void)
 {
-	myOLED.OLEDBitmap(30, 10, 16, 8, MsgIcon, true);
+	printf("OLED Test 302 16x8 pixel image\r\n");
 	myOLED.OLEDBitmap(70, 10, 16, 8,  SignalIcon, false);
 	myOLED.OLEDupdate();
 	
@@ -99,6 +100,7 @@ void Test302(void)
 
 void Test303(void)
 {
+	printf("OLED Test 303 128x64 pixel image, inverted color\r\n");
 	myOLED.OLEDBitmap(0, 0, myOLEDwidth, myOLEDheight, fullscreenBitmap, true);
 	myOLED.OLEDupdate();
 	

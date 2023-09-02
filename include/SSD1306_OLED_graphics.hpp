@@ -74,15 +74,16 @@ class SSD1306_graphics : public Print{
 	const int16_t WIDTH;  /**< This is the 'raw' display w - never changes */
 	const int16_t HEIGHT;  /**< This is the 'raw' display h - never changes*/
 
-	int16_t _width;  /**< Display w as modified by current rotation*/
-	int16_t _height;  /**< Display h as modified by current rotation*/
-	int16_t cursor_x; /**< Current X co-ord cursor position */
-	int16_t cursor_y;  /**< Current Y co-ord cursor position */
-
-	uint8_t textcolor;  /**< Text foreground color */
-	uint8_t textbgcolor;   /**< Text background color */
-	uint8_t   textsize = 1; /**< Size of text ,fonts 1-6 */
-	bool wrap;                    /**< If set, 'wrap' text at right edge of display*/
+	int16_t _width;  /**< Display w as modified by current _rotation*/
+	int16_t _height;  /**< Display h as modified by current _rotation*/
+	int16_t _cursor_x; /**< Current X co-ord cursor position */
+	int16_t _cursor_y;  /**< Current Y co-ord cursor position */
+	uint8_t _rotation; /**< Current rotation 0-3 */
+	
+	uint8_t _textcolor;  /**< Text foreground color */
+	uint8_t _textbgcolor;   /**< Text background color */
+	uint8_t   _textsize = 1; /**< Size of text ,fonts 1-6 */
+	bool _textwrap;                    /**< If set, '_textwrap' text at right edge of display*/
 
 	uint8_t _FontNumber = 1;                /**< Holds current font number */
 	uint8_t _CurrentFontWidth = 5;        /**<Holds current font width in bits */

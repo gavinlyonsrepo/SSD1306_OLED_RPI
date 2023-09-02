@@ -72,6 +72,7 @@ void myLoop()
 	//  ** Test 501 OLED display enable and disable **
 	myOLED.setCursor(0, 30);
 	myOLED.print("Disable test 501");
+	printf("OLED Disable test 501\r\n");
 	myOLED.OLEDupdate();
 
 	bcm2835_delay(2000); 
@@ -84,6 +85,7 @@ void myLoop()
 	// ** Test 502 inverse **
 	myOLED.setCursor(0, 10);
 	myOLED.print("Inverse test 502");
+	printf("OLED Inverse test 502\r\n");
 	myOLED.OLEDupdate();
 	bcm2835_delay(1500);
 	myOLED.OLEDInvert(1); // Inverted
@@ -95,6 +97,7 @@ void myLoop()
 	myOLED.OLEDclearBuffer();
 	myOLED.setCursor(0, 0);
 	myOLED.print("Contrast test 503");
+	printf("OLED Contrast test 503\r\n");
 	myOLED.OLEDupdate();
 	bcm2835_delay(1500);
 	myOLED.OLEDFillScreen(0x77, 0); 
@@ -111,6 +114,7 @@ void myLoop()
 	// ***** Test 504 Scroll **
 	myOLED.setCursor(20,20 );
 	myOLED.print("scroll test 504");
+	printf("OLED scroll test 504\r\n");
 	myOLED.OLEDupdate();
 	bcm2835_delay(2500);
 
@@ -134,7 +138,7 @@ void myLoop()
  	// ** Test 505 rotate test **
  	
  	myOLED.OLEDclearBuffer();
- 	
+ 	printf("OLED rotate test 505\r\n");
 	myOLED.setRotation(1);
 	myOLED.OLEDclearBuffer();
 	myOLED.print(" rotate 1");

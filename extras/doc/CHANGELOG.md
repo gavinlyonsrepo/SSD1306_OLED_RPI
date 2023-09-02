@@ -13,7 +13,7 @@
 	* Added debug messages to I2C write byte method
 	* Large Numerical fonts(7&8) can now display negative sign.
 * version 1.4 Sep 2023
-	* Some code optimisations
-	* string class support added to print
+	* Some code optimisations.
+	* string class support added to print class.
 	* Added Doxygen style comments to create automated API.
 

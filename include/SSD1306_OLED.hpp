@@ -118,7 +118,7 @@ class SSD1306 : public SSD1306_graphics  {
 	void OLED_I2C_OFF(void);
 	void OLED_I2C_ON(void);
 	
-	uint16_t _I2C_speed = 0 ;                         /**< Speed of I2C bus interface */
+	uint16_t _I2C_speed = 0 ;             /**< Speed of I2C bus interface */
 	uint8_t _I2C_address = SSD1306_ADDR ; /**< I2C address */
 	
 	int16_t _OLED_WIDTH;      /**< Width of OLED Screen in pixels */

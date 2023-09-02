@@ -1,7 +1,7 @@
 /*!
 * @file SSD1306_OLED_graphics.cpp
-* @brief  OLED driven by SSD1306 controller. , header file for the  graphics functions
-*  @author Gavin Lyons.
+* @brief  OLED driven by SSD1306 controller. Header file for the graphics functions
+* @author Gavin Lyons.
 * @details https://github.com/gavinlyonsrepo/SSD1306_OLED_RPI
 */
 
@@ -17,11 +17,11 @@ SSD1306_graphics::SSD1306_graphics(int16_t w, int16_t h):
 {
 	_width    = WIDTH;
 	_height   = HEIGHT;
-	cursor_y  = cursor_x    = 0;
-	rotation = 0;
-	textsize  = 1;
-	textcolor = textbgcolor = 0xFF;
-	wrap      = true;
+	_cursor_y  = _cursor_x    = 0;
+	_rotation = 0;
+	_textsize  = 1;
+	_textcolor = _textbgcolor = 0xFF;
+	_textwrap      = true;
 }
 
 /*!
@@ -295,7 +295,6 @@ void SSD1306_graphics::drawRoundRect(int16_t x, int16_t y, int16_t w,
 	@param r  radius of the rounded edges
 	@param color color to fill round  rectangle 
 */
-vo
 void SSD1306_graphics::fillRoundRect(int16_t x, int16_t y, int16_t w,
 				 int16_t h, int16_t r, uint8_t color) {
 	// smarter version
@@ -407,16 +406,16 @@ size_t SSD1306_graphics::write(uint8_t character)
 	if (_FontNumber < OLEDFontType_Bignum)
 	{
 		if (character == '\n') {
-		cursor_y += textsize*_CurrentFontheight;
-		cursor_x  = 0;
+		_cursor_y += _textsize*_CurrentFontheight;
+		_cursor_x  = 0;
 		} else if (character== '\r') {
 		// skip 
 		} else {
-		drawChar(cursor_x, cursor_y, character, textcolor, textbgcolor, textsize);
-		cursor_x += textsize*(_CurrentFontWidth+1);
-			if (wrap && (cursor_x > (_width - textsize*(_CurrentFontWidth+1)))) {
-			  cursor_y += textsize*_CurrentFontheight;
-			  cursor_x = 0;
+		drawChar(_cursor_x, _cursor_y, character, _textcolor, _textbgcolor, _textsize);
+		_cursor_x += _textsize*(_CurrentFontWidth+1);
+			if (_textwrap && (_cursor_x > (_width - _textsize*(_CurrentFontWidth+1)))) {
+			  _cursor_y += _textsize*_CurrentFontheight;
+			  _cursor_x = 0;
 			}
 		}
 	}else if (_FontNumber == OLEDFontType_Bignum || _FontNumber == OLEDFontType_Mednum)
@@ -428,30 +427,30 @@ size_t SSD1306_graphics::write(uint8_t character)
 		switch (character)
 		{
 			case '\n': 
-				cursor_y += _CurrentFontheight;
-				cursor_x  = 0;
+				_cursor_y += _CurrentFontheight;
+				_cursor_x  = 0;
 			break;
 			case '\r': break;
 			case '.':  // draw a circle for decimal & point skip a space.
-				fillCircle(cursor_x+(_CurrentFontWidth/2), cursor_y + (_CurrentFontheight-6), decPointRadius, textcolor);
+				fillCircle(_cursor_x+(_CurrentFontWidth/2), _cursor_y + (_CurrentFontheight-6), decPointRadius, _textcolor);
 				SkipSpace = 1;
 			break;
 			case '-':  // draw a rect for negative number line and skip a space
-				fillRect(cursor_x+2, cursor_y + (_CurrentFontheight/2)-2 ,_CurrentFontWidth-4 , decPointRadius+1,  textcolor);              
+				fillRect(_cursor_x+2, _cursor_y + (_CurrentFontheight/2)-2 ,_CurrentFontWidth-4 , decPointRadius+1,  _textcolor);              
 				SkipSpace = 1;
 			break;
 			default:
-				drawCharNumFont(cursor_x, cursor_y, character, textcolor, textbgcolor);
+				drawCharNumFont(_cursor_x, _cursor_y, character, _textcolor, _textbgcolor);
 				SkipSpace = 1;
 			break;
 		} // end of switch
 		if (SkipSpace == 1)
 		{
-			cursor_x += (_CurrentFontWidth+1);
-			if (wrap && (cursor_x  > (_width - (_CurrentFontWidth+1)))) 
+			_cursor_x += (_CurrentFontWidth+1);
+			if (_textwrap && (_cursor_x  > (_width - (_CurrentFontWidth+1)))) 
 			{
-				cursor_y += _CurrentFontheight;
-				cursor_x = 0;
+				_cursor_y += _CurrentFontheight;
+				_cursor_x = 0;
 			}
 		}
 
@@ -528,8 +527,8 @@ void SSD1306_graphics::drawChar(int16_t x, int16_t y, unsigned char c,
 	@param y Y co-ord position
 */
 void SSD1306_graphics::setCursor(int16_t x, int16_t y) {
-	cursor_x = x;
-	cursor_y = y;
+	_cursor_x = x;
+	_cursor_y = y;
 }
 
 /*! 
@@ -537,7 +536,7 @@ void SSD1306_graphics::setCursor(int16_t x, int16_t y) {
 	@param s Size of text 1-X 
 */
 void SSD1306_graphics::setTextSize(uint8_t s) {
-	textsize = (s > 0) ? s : 1;
+	_textsize = (s > 0) ? s : 1;
 }
 
 /*! 
@@ -545,7 +544,7 @@ void SSD1306_graphics::setTextSize(uint8_t s) {
 	@param c Color fo text 
 */
 void SSD1306_graphics::setTextColor(uint8_t c) {
-	textcolor = textbgcolor = c;
+	_textcolor = _textbgcolor = c;
 }
 
 /*! 
@@ -554,20 +553,20 @@ void SSD1306_graphics::setTextColor(uint8_t c) {
 	@param b color of background of text 
 */
 void SSD1306_graphics::setTextColor(uint8_t c, uint8_t b) {
-	textcolor   = c;
-	textbgcolor = b; 
+	_textcolor   = c;
+	_textbgcolor = b; 
 }
 
 /*!
-	@brief turn on or off screen wrap of the text (fonts 1-6)
+	@brief turn on or off screen _textwrap of the text (fonts 1-6)
 	@param w TRUE on
 */
 void SSD1306_graphics::setTextWrap(bool w) {
-	wrap = w;
+	_textwrap = w;
 }
 
 /*!
-	@brief Gets the width of the display (per current rotation)
+	@brief Gets the width of the display (per current _rotation)
 	@return width member of display in pixels 
 */
 int16_t SSD1306_graphics::width(void) const {
@@ -575,7 +574,7 @@ int16_t SSD1306_graphics::width(void) const {
 }
  
 /*!
-	@brief Gets the height of the display (per current rotation)
+	@brief Gets the height of the display (per current _rotation)
 	@return height member of display in pixels 
 */
 int16_t SSD1306_graphics::height(void) const {
@@ -583,20 +582,20 @@ int16_t SSD1306_graphics::height(void) const {
 }
 
  /*!
-	@brief Gets the rotation of the display 
-	@return rotation value 0-3
+	@brief Gets the _rotation of the display 
+	@return _rotation value 0-3
 */
 uint8_t SSD1306_graphics::getRotation(void) const {
-	return rotation;
+	return _rotation;
 }
 
  /*!
-	@brief Sets the rotation of the display 
-	@param x rotation value 0-3
+	@brief Sets the _rotation of the display 
+	@param x _rotation value 0-3
 */
 void SSD1306_graphics::setRotation(uint8_t x) {
-	rotation = (x & 3);
-	switch(rotation) {
+	_rotation = (x & 3);
+	switch(_rotation) {
 	 case 0:
 	 case 2:
 		_width  = WIDTH;
@@ -773,19 +772,19 @@ void SSD1306_graphics::drawText(uint8_t x, uint8_t y, char *pText, uint8_t color
 		printf("Error: Wrong font selected, must be 1-6 \n");
 		return;
 	}
-	uint8_t cursor_x, cursor_y;
-	cursor_x = x, cursor_y = y;
+	uint8_t _cursor_x, _cursor_y;
+	_cursor_x = x, _cursor_y = y;
 	  while (*pText != '\0') 
 	  {
-		if (wrap && ((cursor_x + size * _CurrentFontWidth) > _width)) 
+		if (_textwrap && ((_cursor_x + size * _CurrentFontWidth) > _width)) 
 		{
-			cursor_x = 0;
-			cursor_y = cursor_y + size * 7 + 3;
-			if (cursor_y > _height) cursor_y = _height;
+			_cursor_x = 0;
+			_cursor_y = _cursor_y + size * 7 + 3;
+			if (_cursor_y > _height) _cursor_y = _height;
 		}
-		drawChar(cursor_x, cursor_y, *pText, color, bg, size);
-		cursor_x = cursor_x + size * (_CurrentFontWidth + 1);
-		if (cursor_x > _width) cursor_x = _width;
+		drawChar(_cursor_x, _cursor_y, *pText, color, bg, size);
+		_cursor_x = _cursor_x + size * (_CurrentFontWidth + 1);
+		if (_cursor_x > _width) _cursor_x = _width;
 		pText++;
 	  }
 }

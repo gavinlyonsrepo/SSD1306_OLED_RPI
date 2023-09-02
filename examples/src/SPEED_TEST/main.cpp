@@ -52,6 +52,7 @@ int main(int argc, char **argv)
 	{
 		return -1;
 	}
+	printf("OLED Frame rate per second test , ends at 1000\r\n");
 	myLoop();
 	EndTests();
 	return 0;

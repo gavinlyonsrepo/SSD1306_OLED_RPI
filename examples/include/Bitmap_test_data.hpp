@@ -4,8 +4,7 @@
 * SW used to make code https://javl.github.io/image2cpp/ 
 */
   
-#ifndef _BITMAP_TEST_DATA_H_
-#define _BITMAP_TEST_DATA_H_
+#pragma once
 
 // 'backupicon', 64x64px 
 const  uint8_t  bigImage[] = {
@@ -136,5 +135,4 @@ const uint8_t  fullscreenBitmap[1024] = {
 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
-#endif // end of guard header
 

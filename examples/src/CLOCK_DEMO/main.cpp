@@ -2,8 +2,9 @@
 	@file SSD1306_OLED_RPI/examples/src/CLOCK_DEMO/main.cpp
 	@author Gavin Lyons
 	@brief Test file for SSD1306_OLED library, Test file showing a "clock demo" 128X64 screen 
-	
 	Project Name: SSD1306_OLED_RPI
+	
+	@details One possible method you can also use strings objects
 	
 	@test
 		-# Test 401 Clock Demo
@@ -18,7 +19,7 @@
 
 #define myOLEDwidth  128
 #define myOLEDheight 64
-uint8_t fullscreenBuffer[1024];
+uint8_t fullscreenBuffer[1024]; // 128 * 64/8
 const uint16_t I2C_Speed = 626; //  bcm2835I2CClockDivider 
 const uint8_t I2C_Address = 0x3C;
 SSD1306 myOLED(myOLEDwidth ,myOLEDheight) ; // instantiate  an object
@@ -81,8 +82,7 @@ void DisplayClock(void)
 	char displayStr[10]={};
 	myOLED.setTextColor(WHITE);
 	int count =0;
-
-	
+	printf("OLED Clock Demo 100 seconds.\r\n");
 	while(count <100)
 	{
 		time(&now);

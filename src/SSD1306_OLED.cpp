@@ -355,7 +355,7 @@ void SSD1306::drawPixel(int16_t x, int16_t y, uint8_t color)
 	return;
 	}
 	int16_t temp;
-	switch (rotation) {
+	switch (_rotation) {
 	case 1:
 		temp = x;
 		x = WIDTH - 1 - y;

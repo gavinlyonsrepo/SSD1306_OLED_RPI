@@ -6,7 +6,7 @@
 	Project Name: SSD1306_OLED_RPI
 	
 	@test
-		1. Test 200 Hello World 128by32 screen
+		1. Test 200 Hello World 128by32 pixel screen
 */
 #include <bcm2835.h>
 #include <time.h>
