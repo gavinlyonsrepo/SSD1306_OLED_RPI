@@ -84,7 +84,7 @@ make
 make run
 ```
 
-2. There are seven examples files to try out. 
+2. There are 6 examples files to try out. 
 To decide which one the makefile builds simply edit "SRC" variable at top of the makefile in examples folder.
 in the "User SRC directory Option Section". Pick an example "SRC" directory path and ONE ONLY.
 Comment out the rest and repeat: make and make run.
@@ -97,7 +97,6 @@ Comment out the rest and repeat: make and make run.
 | src/OLED_FUNCTIONS |Test functions like scroll, rotate etc | 128x64 |
 | src/SPEED_TEST | Frame rate per second test | 128x64 |
 | src/TEXT_GRAPHICS |Tests Text , fonts and graphics  | 128x64 |
-| src/HELLO_WORLD_128_32 | Basic use case  | 128x32 |
 
 ## Hardware
 
@@ -195,7 +194,7 @@ See Pull request number 2 on github.
 2. To test on a different size of display edit the myOLEDwidth & myOLEDheight
 variables in examples files.
 
-| Display size | Supported Tested | 
+| Display size | Supported | Tested | 
 | ------ | ------ | ------ |
 | 128x64 | Yes | Yes |
 | 128x32 | Yes | Yes |
