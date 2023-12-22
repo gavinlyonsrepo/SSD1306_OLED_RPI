@@ -15,6 +15,7 @@
 	* [Fonts](#fonts)
 	* [Bitmaps](#bitmaps)
   * [Output](#output)
+  * [Notes](#notes)
 
 
 ## Overview
@@ -27,7 +28,7 @@
 1. Dynamic install-able system level Raspberry Pi C++ library.
 2. Inverse color, rotate, sleep, scroll and contrast control.
 3. Default font is Extended ASCII, scalable font.
-4. 8 fonts included.
+4. 10 fonts included.
 5. Graphics class included.
 6. Bitmaps supported.
 7. Hardware I2C using bcm2835 library
@@ -36,18 +37,18 @@
 
 * Author: Gavin Lyons
 
-* Tested setup
+* Development toolchain.
 	1. Raspberry PI 3 model b, 
 	2. C++ complier g++ (Raspbian 8.3.0-6)
-	3. Raspbian 10 buster  OS
-	4. bcm2835 Library 1.68 (Dependency)
+	3. Raspbian 10 buster OS, 32 bit.
+	4. bcm2835 Library 1.73 (Dependency)
 
 
 ## Installation
 
 1. Make sure I2C bus is enabled on your raspberry PI
 
-2. Install the dependency bcm2835 Library if not installed (at time of writing latest version is 1.68.)
+2. Install the dependency bcm2835 Library if not installed (at time of writing latest version is 1.73.)
 	* The bcm2835 library is a dependency and provides I2C bus, delays and GPIO control.
 	* Install the C libraries of bcm2835, [Installation instructions here](http://www.airspayce.com/mikem/bcm2835/)
 
@@ -56,14 +57,14 @@
 	* Run following command to download from github.
     
 ```sh
-curl -sL https://github.com/gavinlyonsrepo/SSD1306_OLED_RPI/archive/1.4.tar.gz | tar xz
+curl -sL https://github.com/gavinlyonsrepo/SSD1306_OLED_RPI/archive/1.5.tar.gz | tar xz
 ```
 
 4. Run "make" to run the makefile in repo base folder to install library, it will be 
     installed to usr/lib and usr/include
     
 ```sh
-cd SSD1306_OLED_RPI-1.4
+cd SSD1306_OLED_RPI-1.5
 make
 sudo make install
 ```
@@ -117,44 +118,54 @@ Lots of information on the software.
 
 Hardware I2C.
 
-1. I2C Address is set by default to  0x3C(your module could be different, 
+1. I2C Address is set by default to 0x3C(your module could be different, 
 	user can change argument passed into "OLEDbegin" method).
-2. In the event of an error writing a byte, debug info with error code will be written to console. This error code is the bcm2835I2CReasonCodes enum.
 
-3. I2C Clock rate can be a passed into in the "OLEDbegin" method as a argument, five possible values : 
+2. I2C Clock rate can be a passed into in the "OLEDbegin" method as a argument, five possible values : 
+If you send 0 (the default) It sets it to 100KHz and uses bcm2835_i2c_set_baudrate to do so.
+Alternatively you can pass 1 of 4 BCM2835_I2C_CLOCK_DIVIDER values 2500, 626 150 or 148.
+See image below.
 
-| Value | Method | I2C speed | 
-| ---- | ---- | ---- | 
-| 0 (default) | bcm2835_i2c_set_baudrate(100000) | 100Khz | 
-| 2500 | bcm2835_i2c_setClockDivider(BCM2835_I2C_CLOCK_DIVIDER_2500) | 100Khz | 
-| 626 | bcm2835_i2c_setClockDivider(BCM2835_I2C_CLOCK_DIVIDER_626) | 399.4 kHz | 
-| 150 | bcm2835_i2c_setClockDivider(BCM2835_I2C_CLOCK_DIVIDER_150) | 1.666 MHz | 
-| 148 | bcm2835_i2c_setClockDivider(BCM2835_I2C_CLOCK_DIVIDER_148) | 1.689 MHz | 
+3. In the event of an error writing a byte, debug info with error code will be written to console. 
+	This error code is the bcm2835I2CReasonCodes enum. Debug flag must be set to true to see this output.
+	See image below for  bcm2835I2CReasonCodes. 
+	
+![ bcm ](https://github.com/gavinlyonsrepo/SSD1306_OLED_RPI/blob/main/extras/image/bcm.jpg)
 
 For more info on bcm2835I2CClockDivider & bcm2835I2CReasonCodes see [bcm2835 doc's for details](http://www.airspayce.com/mikem/bcm2835/group__constants.html)
 
 ### Fonts
 
-There are Eight fonts.
-A print class is available to print out many data types.
-Fonts 1-6 are byte high(at text size 1) scale-able fonts, columns of padding added by SW.
-Font 7-8 are large numerical fonts and cannot be scaled(just one size).  
-It is possible to use ':',  '.' and '-' symbol's with fonts 7-8, see example file for details.
-
-Eight fonts available : 
-
 Font data table: 
 
-| Font num | Font enum name | Font size xbyy |  ASCII range | Size in bytes |
-| ------ | ------ | ------ | ------ |  ------ | 
-| 1 | OLEDFontType_Default | 5x8 | ASCII 0 - 0xFF, Full Extended  | 1275 |
-| 2 | OLEDFontType_Thick   | 7x8 |  ASCII  0x20 - 0x5A, no lowercase letters | 406 | 
-| 3 | OLEDFontType_SevenSeg  | 4x8 | ASCII  0x20 - 0x7A | 360 |
-| 4 | OLEDFontType_Wide | 8x8 |  ASCII 0x20 - 0x5A, no lowercase letters| 464 |
-| 5 | OLEDFontType_Tiny | 3x8 | ASCII  0x20 - 0x7E | 285 |
-| 6 | OLEDFontType_Homespun  | 7x8 | ASCII  0x20 - 0x7E |  658 |
-| 7 | OLEDFontType_Bignum | 16x32 | ASCII 0x30-0x3A ,Numbers + : only | 704 |
-| 8 | OLEDFontType_Mednum | 16x16 | ASCII 0x30-0x3A , Numbers + : only | 352 |
+| num | enum name | Char size XbyY | ASCII range | Size bytes | Scale-able |
+| ------ | ------ | ------ | ------ |  ------ | ----- |
+| 1 | $_Default | 5x8 |0-0xFF, Full Extended|1275 |Y|
+| 2 | $_Thick   | 7x8 |0x20-0x5A, no lowercase letters |406|Y|
+| 3 | $_SevenSeg  | 4x8 |0x20-0x7A |360|Y|
+| 4 | $_Wide | 8x8 |0x20-0x5A, no lowercase letters|464|Y|
+| 5 | $_Tiny | 3x8 |0x20-0x7E |285|Y|
+| 6 | $_Homespun  | 7x8 |0x20-0x7E |658|Y|
+| 7 | $_Bignum | 16x32 |0x2D-0x3A ,0-10 - . / : |896|N|
+| 8 | $_Mednum | 16x16 |0x2D-0x3A ,0-10 - . / :|448|N|
+| 9 | $_ArialRound| 16x24 | 0x20-0x7E |4608|N|
+| 10 | $_ArialBold | 16x16 |0x20-0x7E |3072|N|
+
+1. $ = OLEDFontType
+2. A print class is available to print out many data types.
+3. Fonts 1-6 are byte high(at text size 1) scale-able fonts, columns of padding added by SW.
+4. Font 7-8 are large numerical fonts and cannot be scaled(just one size). 
+5. Fonts 9-10 large Alphanumeric fonts and cannot be scaled(just one size) 
+
+Font Methods: 
+
+| Font num | Method | Notes |
+| ------ | ------ | ------ |
+| 1-6 | drawChar| draws single  character |
+| 1-6 | drawText | draws character array |
+| 7-10 | drawCharBigFont | draws single  character |
+| 7-10 | drawTextBigFont | draws character array |
+| 1-10 | print | Polymorphic print class which will print out most data types |
 
 ### Bitmaps
 
@@ -173,3 +184,23 @@ See example file "BITMAP" for more details.
 Output of the example file "CLOCK_DEMO".
 
 ![ op ](https://github.com/gavinlyonsrepo/SSD1306_OLED_RPI/blob/main/extras/image/output.jpg)
+
+## Notes
+
+1. Note the toolchain used in Overview section, If you have trouble compiling on other 
+platforms or OS. For example 64-bit OS, user may need to remove or edit
+the CCFLAGS in root directory Makefile to allow for Compilation.
+See Pull request number 2 on github.
+
+2. To test on a different size of display edit the myOLEDwidth & myOLEDheight
+variables in examples files.
+
+| Display size | Supported Tested | 
+| ------ | ------ | ------ |
+| 128x64 | Yes | Yes |
+| 128x32 | Yes | Yes |
+| ???x16 | Yes | NO |
+
+
+
+    

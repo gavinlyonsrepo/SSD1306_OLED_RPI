@@ -132,7 +132,9 @@ size_t Print::print(const std::string &s) {
 }
 
 size_t Print::println(const std::string &s) {
-    return println(s);
+    size_t n = print(s);
+    n += println();
+    return n;
 }
 
 // Private Methods /////////////////////////////////////////////////////////////

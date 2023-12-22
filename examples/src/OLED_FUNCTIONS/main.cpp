@@ -20,48 +20,77 @@
 
 #define myOLEDwidth  128
 #define myOLEDheight 64
-const uint16_t I2C_Speed = 626; //  bcm2835I2CClockDivider 
-const uint8_t I2C_Address = 0x3C;
 SSD1306 myOLED(myOLEDwidth ,myOLEDheight);
 
 // =============== Function prototypes ================
-void setup(void);
-void myLoop(void);
+bool SetupTest(void);
+void Test(void);
+void EndTest(void);
 
 // ======================= Main ===================
 int main(int argc, char **argv)
 {
-	if(!bcm2835_init())
-	{
-		printf("Error 1201 : Failure to init bcm2835 library\r\n");
-		return -1;
-	}
-	bcm2835_delay(50);
-	printf("OLED Begin\r\n");
-	setup();
-	myOLED.setRotation(0);
-	myLoop();
-	myOLED.OLEDPowerDown();
-	bcm2835_close(); // Close the library,
-	printf("OLED End\r\n");
+	if (SetupTest() != true) return -1;
+	Test();
+	EndTest();
 	return 0;
 }
 // ======================= End of main  =====
 
 // =============== Functions ================
-void setup()
+bool SetupTest() 
 {
-	myOLED.OLEDbegin(I2C_Speed, I2C_Address); // initialize the OLED
-	myOLED.OLEDFillScreen(0x11, 0); // splash screen
-	myOLED.setTextColor(WHITE);
+	const uint16_t I2C_Speed = 626; // bcm2835I2CClockDivider enum ,see readme.
+	const uint8_t I2C_Address = 0x3C;
+	bool I2C_debug = false;
+	
+	printf("OLED Test Begin\r\n");
+	printf("SSD1306 library Version Number :: %u\r\n",myOLED.getLibVerNum());
+	
+	// Check if Bcm28235 lib installed and print version.
+	if(!bcm2835_init())
+	{
+		printf("Error 1201: init bcm2835 library , Is it installed ?\r\n");
+		return false;
+	}else
+	{
+		printf("bcm2835 library Version Number :: %u\r\n",bcm2835_version());
+		bcm2835_delay(100);
+	}
+	
+	// Turn on I2C bus (optional it may already be on)
+	while(myOLED.OLED_I2C_ON() != true)
+	{
+		printf("Error 1202: bcm2835_i2c_begin :Cannot start I2C, Running as root?\n");
+		bcm2835_delay(1500);
+	}
+	
+	myOLED.OLEDbegin(I2C_Speed, I2C_Address, I2C_debug); // initialize the OLED
+	myOLED.OLEDFillScreen(0xF0, 0); // splash screen bars, optional just for effect
 	bcm2835_delay(1000);
+	return true;
 }
 
-void myLoop()
+void EndTest()
 {
-	// Define a full screen buffer and struct
+	myOLED.OLEDPowerDown(); //Switch off display
+	myOLED.OLED_I2C_OFF(); // Switch off I2C , optional may effect other programs & devices
+	bcm2835_close(); // Close the library
+	printf("OLED Test End\r\n");
+}
+
+void Test()
+{
+	myOLED.setRotation(0);
+	
+	// Define a full screen buffer
 	uint8_t  screenBuffer[myOLEDwidth * (myOLEDheight / 8) ];
 	myOLED.buffer = (uint8_t*) &screenBuffer;  // set that to library buffer pointer
+	if(myOLED.buffer == nullptr) // check if pointer is still = null
+	{
+		printf("Error 1203 :: Problem assigning buffer pointer\r\n");
+		exit(-1);
+	}
 	myOLED.OLEDclearBuffer(); // clear the buffer
 
 	// Set text parameters
@@ -113,32 +142,32 @@ void myLoop()
 
 	// ***** Test 504 Scroll **
 	myOLED.setCursor(20,20 );
-	myOLED.print("scroll test 504");
-	printf("OLED scroll test 504\r\n");
+	myOLED.print("Scroll test 504");
+	printf("OLED Scroll test 504\r\n");
 	myOLED.OLEDupdate();
 	bcm2835_delay(2500);
 
-	myOLED.OLED_StartScrollRight(0, 0x0F);
+	myOLED.OLEDStartScrollRight(0, 0x0F);
 	bcm2835_delay(3000);
-	myOLED.OLED_StopScroll();
+	myOLED.OLEDStopScroll();
 	
-	myOLED.OLED_StartScrollLeft(0, 0x0F);
+	myOLED.OLEDStartScrollLeft(0, 0x0F);
 	bcm2835_delay(3000);
-	myOLED.OLED_StopScroll();
+	myOLED.OLEDStopScroll();
 
-	myOLED.OLED_StartScrollDiagRight(0, 0x07);
+	myOLED.OLEDStartScrollDiagRight(0, 0x07);
 	bcm2835_delay(3000);
-	myOLED.OLED_StopScroll();
+	myOLED.OLEDStopScroll();
  	
-	myOLED.OLED_StartScrollDiagLeft(0, 0x07);
+	myOLED.OLEDStartScrollDiagLeft(0, 0x07);
 	bcm2835_delay(3000);
-	myOLED.OLED_StopScroll();
+	myOLED.OLEDStopScroll();
  	
  	
  	// ** Test 505 rotate test **
  	
  	myOLED.OLEDclearBuffer();
- 	printf("OLED rotate test 505\r\n");
+ 	printf("OLED Rotate test 505\r\n");
 	myOLED.setRotation(1);
 	myOLED.OLEDclearBuffer();
 	myOLED.print(" rotate 1");

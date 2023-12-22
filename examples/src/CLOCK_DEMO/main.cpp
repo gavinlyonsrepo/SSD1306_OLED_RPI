@@ -19,26 +19,21 @@
 
 #define myOLEDwidth  128
 #define myOLEDheight 64
-uint8_t fullscreenBuffer[1024]; // 128 * 64/8
-const uint16_t I2C_Speed = 626; //  bcm2835I2CClockDivider 
-const uint8_t I2C_Address = 0x3C;
+uint8_t fullscreenBuffer[myOLEDwidth * (myOLEDheight/8)]; //1024  128 * 64/8
 SSD1306 myOLED(myOLEDwidth ,myOLEDheight) ; // instantiate  an object
 
 // =============== Function prototype ================
-int8_t  setup(void);
-void myLoop(void);
+bool SetupTest(void);
+void Test(void);
+void EndTests(void);
 void DisplayClock(void);
 void SplashScreen(void);
-void EndTests(void);
 
 // ======================= Main ===================
 int main(int argc, char **argv)
 {
-	if (!setup())
-	{
-		return -1;
-	}
-	myLoop();
+	if (SetupTest() != true) return -1;
+	Test();
 	EndTests();
 	return 0;
 }
@@ -46,28 +41,50 @@ int main(int argc, char **argv)
 
 
 // ======================= Function space ===================
+bool SetupTest() 
+{
+	const uint16_t I2C_Speed = 626; // bcm2835I2CClockDivider enum ,see readme.
+	const uint8_t I2C_Address = 0x3C;
+	bool I2C_debug = false;
+	
+	printf("OLED Test Begin\r\n");
+	printf("SSD1306 library Version Number :: %u\r\n",myOLED.getLibVerNum());
+	
+	// Check if Bcm28235 lib installed and print version.
+	if(!bcm2835_init())
+	{
+		printf("Error 1201: init bcm2835 library , Is it installed ?\r\n");
+		return false;
+	}else
+	{
+		printf("bcm2835 library Version Number :: %u\r\n",bcm2835_version());
+		bcm2835_delay(100);
+	}
+	
+	// Turn on I2C bus (optional it may already be on)
+	while(myOLED.OLED_I2C_ON() != true)
+	{
+		printf("Error 1202: bcm2835_i2c_begin :Cannot start I2C, Running as root?\n");
+		bcm2835_delay(1500);
+	}
+	
+	myOLED.OLEDbegin(I2C_Speed, I2C_Address, I2C_debug); // initialize the OLED
+	myOLED.OLEDFillScreen(0xF0, 0); // splash screen bars, optional just for effect
+	bcm2835_delay(1000);
+	return true;
+}
+
+
 void EndTests()
 {
 	myOLED.OLEDPowerDown(); //Switch off display
+	myOLED.OLED_I2C_OFF(); // Switch off I2C , optional may effect other programs & devices
 	bcm2835_close(); // Close the library
-	printf("OLED End\r\n");
+	printf("OLED Test End\r\n");
 }
 
-int8_t setup()
-{
-	if(!bcm2835_init())
-	{
-		printf("Error 1201 Cannot init bcm2835 library\n");
-		return -1;
-	}
-	bcm2835_delay(50);
-	printf("OLED Begin\r\n");
-	myOLED.OLEDbegin(I2C_Speed, I2C_Address); // initialize the OLED
 
-	return 1;
-}
-
-void myLoop()
+void Test()
 {
 	SplashScreen();  
 	DisplayClock();  
@@ -138,6 +155,11 @@ void DisplayClock(void)
 void SplashScreen(void)
 {
 	myOLED.buffer = (uint8_t*) &fullscreenBuffer;
+	if(myOLED.buffer == nullptr) // check if pointer is still = null
+	{
+		printf("Error 1203 :: Problem assigning buffer pointer\r\n");
+		exit(-1);
+	}
 	myOLED.OLEDBitmap(0, 0, myOLEDwidth, myOLEDheight, fullscreenBitmap, true);
 	myOLED.OLEDupdate();
 	bcm2835_delay(5000);

@@ -14,6 +14,11 @@
 	* Large Numerical fonts(7&8) can now display negative sign.
 * version 1.4 Sep 2023
 	* Some code optimisations.
-	* string class support added to print class.
+	* String object support added to print class.
 	* Added Doxygen style comments to create automated API.
-
+* version 1.5 Dec 2023
+	* Added large alphaNumeric fonts(9-10), Arial bold and Arial round.
+	* Increased size of Numerical fonts (7&8) from 11 to 14 characters.
+	* Refactored I2C bus control to give user more control and visibility.
+	* Changed CCFLAGS in root directory Makefile to allow for Compilation on 64-bit systems. See Pull request number 2 on github
+	* Fixed bug in "println" method for String objects.

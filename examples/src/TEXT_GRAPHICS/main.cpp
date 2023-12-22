@@ -10,86 +10,116 @@
 		-# Test 702 font size 2 integer
 		-# Test 703 font size 1 string inverted
 		-# Test 704 draw a single character font size 4
-		-# Test 705 print ASCII  font 0-127
+		-# Test 705 print ASCII font 0-127
 		-# Test 706 print ASCII font 128-255
 		-# Test 707 thick font 2 (NO LOWERCASE)
 		-# Test 708 seven seg font 3
-		-# Test 709 wide font (NO LOWERCASE)
-		-# Test 710 tiny font
-		-# Test 711 homespun font
-		-# Test 712 bigNums font 7(NUMS ONLY + : )
-		-# Test 713 medNums font 8 (NUMS ONLY + : )
-		-# Test 714 test print method 
-		-# Test 715 Drawtext
+		-# Test 709 wide font 4 (NO LOWERCASE)
+		-# Test 710 tiny font 5
+		-# Test 711 homespun font 6
+		-# Test 712 bigNums font 7(numeric font  0-10 : . / -)
+		-# Test 713 medNums font 8 (numeric font 0-10 + : . / -)
+		-# Test 714 Arial round font 9
+		-# Test 715 Arial bold font 10
+		-# Test 716 various print method tests
+		-# Test 717 drawtext method text screen wrap
 		-# Test 901 Graphics test
 */
 
 #include <bcm2835.h>
 #include <time.h>
 #include <stdio.h>
-
 #include "SSD1306_OLED.hpp"
 
 #define myOLEDwidth  128
 #define myOLEDheight 64
+SSD1306 myOLED(myOLEDwidth ,myOLEDheight) ; // instantiate  an object
 
+// Test timing delays 
 #define DisplayDelay1 4000
 #define DisplayDelay2 0
 
-const uint16_t I2C_Speed = 626; //  bcm2835I2CClockDivider 
-const uint8_t I2C_Address = 0x3C;
-SSD1306 myOLED(myOLEDwidth ,myOLEDheight) ; // instantiate  an object
 
 // =============== Function prototype ================
-void SetupTest(void);
-void TestLoop(void);
-void DisplayText( );
-void DisplayGraphics( );
-void EndTest(void);
+bool SetupTest(void);
+void myTests(void);
+void EndTests(void);
 void TestReset(void);
+
+void DisplayTextTests1(void);
+void DisplayTextTests2(void);
+void DisplayTextTests3(void);
+void DisplayGraphics(void);
 
 // ======================= Main ===================
 int main(int argc, char **argv)
 {
-	if(!bcm2835_init())
-	{
-		return -1;
-	}
-
 	SetupTest();
-	TestLoop();
-	EndTest();
-	
+	myTests();
+	EndTests();
 	return 0;
 }
 // ======================= End of main  ===================
 
 
-// ===================== Function Space =====================
-
-void SetupTest() 
+// ======================= Function space ===================
+bool SetupTest() 
 {
-	bcm2835_delay(500);
-	printf("OLED Begin\r\n");
-	myOLED.OLEDbegin(I2C_Speed, I2C_Address); // initialize the OLED
-	myOLED.OLEDFillScreen(0x8F, 0); //splash screen bars
+	const uint16_t I2C_Speed = 626; // bcm2835I2CClockDivider enum ,see readme.
+	const uint8_t I2C_Address = 0x3C;
+	bool I2C_debug = false;
+	
+	printf("OLED Test Begin\r\n");
+	printf("SSD1306 library Version Number :: %u\r\n",myOLED.getLibVerNum());
+	
+	// Check if Bcm28235 lib installed and print version.
+	if(!bcm2835_init())
+	{
+		printf("Error 1201: init bcm2835 library , Is it installed ?\r\n");
+		return false;
+	}else
+	{
+		printf("bcm2835 library Version Number :: %u\r\n",bcm2835_version());
+		bcm2835_delay(100);
+	}
+	
+	// Turn on I2C bus (optional it may already be on)
+	while(myOLED.OLED_I2C_ON() != true)
+	{
+		printf("Error 1202: bcm2835_i2c_begin :Cannot start I2C, Running as root?\n");
+		bcm2835_delay(1500);
+	}
+	
+	myOLED.OLEDbegin(I2C_Speed, I2C_Address, I2C_debug); // initialize the OLED
+	myOLED.OLEDFillScreen(0xF0, 0); // splash screen bars, optional just for effect
 	bcm2835_delay(1000);
+	return true;
 }
 
-void EndTest()
+
+void EndTests()
 {
 	myOLED.OLEDPowerDown(); //Switch off display
-	bcm2835_close(); // Close the library
-	printf("OLED End\r\n");
+	myOLED.OLED_I2C_OFF(); // Switch off I2C , optional may effect other programs & devices
+	bcm2835_close(); // Close the bcm2835 library
+	printf("OLED Test End\r\n");
 }
 
-void TestLoop()
+void myTests()
 {
 
 	// Define a full screen buffer
 	uint8_t  screenBuffer[(myOLEDwidth * (myOLEDheight / 8)) + 1];
 	myOLED.buffer = (uint8_t*) &screenBuffer;  
-	DisplayText();
+	if(myOLED.buffer == nullptr) // check if pointer is still = null
+	{
+		printf("Error 1203 :: Problem assigning buffer pointer\r\n");
+		exit(-1);
+	}
+	
+	DisplayTextTests1();
+	DisplayTextTests2();
+	DisplayTextTests3();
 	DisplayGraphics();
 }
 
@@ -99,8 +129,7 @@ void TestReset(void){
 	myOLED.OLEDclearBuffer();
 }
 
-
-void DisplayText()
+void DisplayTextTests1()
 {
 
 	myOLED.setTextWrap(true);
@@ -108,35 +137,35 @@ void DisplayText()
 	
 	myOLED.OLEDclearBuffer(); // Clear the buffer
 	// Test 701
-	printf("OLED Test 701 Font size 3 float \r\n");
+	printf("OLED Test 701 Default Font size 3 float\r\n");
 	myOLED.setTextColor(WHITE);
 	myOLED.setTextSize(3);
 	myOLED.setCursor(0, 0);
-	float PI =3.14;
+	float PI = 3.14;
 	myOLED.print(PI);
 
 	// Test 702
-	printf("OLED Test 702 font size 2 integer \r\n");
+	printf("OLED Test 702 Default font size 2 integer\r\n");
 	myOLED.setTextSize(2);
 	myOLED.setCursor(0, 30);
 	int count = 123;
 	myOLED.print(count);
 
 	// Test 703
-	printf("OLED Test 703 font size 1 string inverted \r\n");
+	printf("OLED Test 703 Default font, size 1 string inverted\r\n");
 	myOLED.setTextSize(1);
 	myOLED.setTextColor(BLACK, WHITE);
 	myOLED.setCursor(0, 50);
 	myOLED.print("Hello World");
 
 	// Test 704
-	printf("OLED Test 704 draw a single character font size 4 \r\n");
+	printf("OLED Test 704 Default font ,size 4, single character\r\n");
 	myOLED.drawChar(95, 15 , 'H', WHITE, BLACK, 6);
 
 	TestReset();
 
 	// Test 705
-	printf("OLED Test 705 print ASCII  font 0-127 \r\n");
+	printf("OLED Test 705 Default font print ASCII table 0-127 \r\n");
 	myOLED.setCursor(0, 0);
 	myOLED.setTextColor(WHITE);
 	myOLED.setTextSize(1);
@@ -163,10 +192,10 @@ void DisplayText()
 	myOLED.setCursor(x, y);
 	
 	// Test 706
-	printf("OLED Test 706 print ASCII  font 128-255 \r\n");
+	printf("OLED Test 706 Default font  print ASCII table 128-255 \r\n");
 	for (uint8_t i = 128; i < 255; i++)
 	{
-		if (x > 180)
+		if (x > 120)
 		{
 			x = 0;
 			y += 9;
@@ -185,11 +214,11 @@ void DisplayText()
 	myOLED.setCursor(0, 0);
 	myOLED.print("THE THICK FONT");
 	myOLED.setCursor(0, 9);
-	myOLED.print("1234567890123456");
+	myOLED.print("NO LOWERCASE");
 	myOLED.drawChar(70, 20 , 'H', WHITE, BLACK, 4);
 	myOLED.setCursor(0, 45);
 	myOLED.setTextSize(2);
-	myOLED.print("TEST");
+	myOLED.print(1234);
 	TestReset();
 	
 	// Test 708
@@ -202,7 +231,7 @@ void DisplayText()
 	myOLED.print("123456789012345678012345");
 	myOLED.setCursor(0, 30);
 	myOLED.setTextSize(5);
-	myOLED.print("14:30");
+	myOLED.print(-14.8);
 	TestReset();
 	
 	// Test 709
@@ -212,10 +241,10 @@ void DisplayText()
 	myOLED.setCursor(0, 0);
 	myOLED.print("WIDE FONT");
 	myOLED.setCursor(0, 9);
-	myOLED.print("12345678901234");
+	myOLED.print("NO LOWERCASE 4");
 	myOLED.setCursor(0, 30);
 	myOLED.setTextSize(2);
-	myOLED.print("13:57");
+	myOLED.print(13.57);
 	TestReset();
 	
 	// Test 710
@@ -228,7 +257,7 @@ void DisplayText()
 	myOLED.print("123456 tiny");
 	myOLED.setCursor(0, 35);
 	myOLED.setTextSize(2);
-	myOLED.print("T 11:52");
+	myOLED.print("99:52");
 	TestReset();
 	
 	// Test 711
@@ -236,53 +265,103 @@ void DisplayText()
 	myOLED.setFontNum(OLEDFontType_Homespun);
 	myOLED.setTextSize(1);
 	myOLED.setCursor(0, 0);
-	myOLED.print("Home Font:");
+	myOLED.print("Homespun Font:");
 	myOLED.setCursor(0, 15);
 	myOLED.print("123456 home");
 	myOLED.setCursor(0, 35);
 	myOLED.setTextSize(2);
-	myOLED.print("T 19:24");
+	myOLED.print(19.6657, 3); // print 19.666
 	TestReset();
 	
+}
+
+void DisplayTextTests2()
+{
 	// Test 712
-	printf("OLED Test 712 bigNums font 7(NUMS ONLY + : ) \r\n");
+	printf("OLED Test 712 bigNums font 7(NUMBERS / : . - ONLY)\r\n");
+	
 	myOLED.setFontNum(OLEDFontType_Bignum);
-	myOLED.setTextColor(WHITE, BLACK);
 	char myString[9] = {'1','9',':','2','2',':','3','8'};
-	myOLED.drawCharNumFont(0, 0, '8', BLACK, WHITE); // single character inverted
-	myOLED.drawTextNumFont(0, 32, myString , WHITE, BLACK); 
+	myOLED.drawCharBigFont(0, 0, '8', BLACK, WHITE); // single character inverted
+	myOLED.drawTextBigFont(0, 32, myString , WHITE, BLACK); 
 	
-	myOLED.OLEDupdate();  // Write to the buffer
-	bcm2835_delay(DisplayDelay1);
-	myOLED.OLEDclearBuffer();
+	TestReset(); 
 	
-	// Test 713
-	printf("OLED Test 713 medNums font 8(NUMS ONLY + : ) \r\n");
-	myOLED.setFontNum(OLEDFontType_Mednum);
-	char myTest[] = "1234567812::5678";
-	myOLED.drawCharNumFont(0, 40, '9', BLACK, WHITE); // single character inverted
-	myOLED.drawTextNumFont(0, 0, myTest, WHITE, BLACK);
-	
-	TestReset();
-	
-	// Test 714 
-	printf("OLED Test 714 print method \r\n");
-	myOLED.setTextColor(WHITE, BLACK);
-	
-	myOLED.setFontNum(OLEDFontType_Bignum);
+	myOLED.setTextColor(WHITE, BLACK); // normal
 	myOLED.setCursor(0, 0);
 	myOLED.print(-87.39);
-	
-	myOLED.setFontNum(OLEDFontType_Mednum);
-	myOLED.setCursor(0, 40);
-	myOLED.print(3.9);
-	myOLED.print(-19);
+	myOLED.setTextColor(BLACK, WHITE); //invert
+	myOLED.setCursor(0, 32);
+	myOLED.print(-99.67);
 	
 	TestReset();
 	
-	// Test 714b 
-	printf("OLED Test 714-B Base number systems using print \r\n");
+	// Test 713
+	
+	printf("OLED Test 713 medNums font 8(NUMBERS : . / - ONLY)\r\n");
+	
+	myOLED.setFontNum(OLEDFontType_Mednum);
+	char myTest[] = "1234567812::5678";
+	myOLED.drawCharBigFont(0, 40, '9', BLACK, WHITE); // single character inverted
+	myOLED.drawTextBigFont(0, 0, myTest, WHITE, BLACK);
+	
+	TestReset();
+	
+	myOLED.setTextColor(BLACK, WHITE); //invert
+	myOLED.setCursor(5, 10);
+	myOLED.print(-35.96);
+	myOLED.setTextColor(WHITE, BLACK); // normal
+	myOLED.setCursor(5, 30);
+	myOLED.print(-19.98);
+	
+	TestReset();
+	
+	// Test 714 Arial round
+	printf("OLED Test 714 Arial round font \r\n");
+	myOLED.setFontNum(OLEDFontType_ArialRound);
+	myOLED.setCursor(0, 0);
+	myOLED.print("Arial");
+	char myTest14[] = "123";
+	myOLED.drawTextBigFont(0,25, myTest14, BLACK, WHITE);
+	
+	TestReset();
+	
+	myOLED.setCursor(0, 0);
+	myOLED.print(-27.31);
+	myOLED.setTextColor(BLACK, WHITE); //invert
+	myOLED.setCursor(0, 24);
+	myOLED.print(1234.0);
+	
+	TestReset();
+	
+	// Test 715 Arial bold
+	printf("OLED Test 715 Arial bold font  \r\n");
+	myOLED.setFontNum(OLEDFontType_ArialBold);
+	myOLED.setCursor(0, 0);
+	myOLED.print("Arial B");
+	myOLED.drawTextBigFont(5, 25, myTest14, BLACK, WHITE);
+	
+	TestReset();
+	
+	myOLED.setTextColor(WHITE, BLACK); // normal
+	myOLED.setCursor(0, 0);
+	myOLED.print(346.91);
+	myOLED.setTextColor(BLACK, WHITE); // invert
+	myOLED.setCursor(0, 40);
+	myOLED.print(-19);
+	myOLED.setTextColor(WHITE, BLACK); // normal
+	
+	TestReset();
+}
+
+void DisplayTextTests3()
+{
+
+	// Test 716-a 
+	printf("OLED Test 716-A Base number systems using print \r\n");
 	myOLED.setFontNum(OLEDFontType_Default);
+	
+	
 	myOLED.setCursor(0, 0);
 	myOLED.print(47 , DEC);
 	myOLED.setCursor(0, 16);
@@ -293,22 +372,37 @@ void DisplayText()
 	myOLED.print(47 , OCT);
 	TestReset();
 	
-	// Test 714C string method
-	printf("OLED Test 714-C string object method using print \r\n");
+	// Test 716-B string method
+	printf("OLED Test 716-B string object method using print \r\n");
 	std::string timeInfo = "12:45";
-	myOLED.setCursor(0, 0);
+	myOLED.setCursor(5, 0);
+	myOLED.println(timeInfo);
 	myOLED.print(timeInfo);
 	TestReset();
 	
-	// Test 715
-	printf("OLED Test 715 drawtext method \r\n");
+	// Test 716-C
+	printf("OLED Test 716-C print overlap  + invert \r\n");
+	myOLED.setFontNum(OLEDFontType_Homespun);
+	myOLED.setCursor(0, 0);
+	myOLED.print("1234567890abcdefghij");
+	myOLED.setCursor(0, 32);
+	myOLED.setTextColor(BLACK, WHITE); // invert
+	myOLED.print("inverted"); 
+	TestReset();
+	
+	
+	// Test 717
+	printf("OLED Test 717 drawtext method overlap \r\n");
+	char myString[9] = {'1','9',':','2','2',':','3','8'};
+	char myTest[] = "1234567812::5678";
+	myOLED.setTextColor(WHITE, BLACK); // normal
 	myOLED.setFontNum(OLEDFontType_Tiny);
 	myOLED.drawText(0,0, myString, WHITE, BLACK,1);
 	myOLED.setFontNum(OLEDFontType_Wide);
 	myOLED.drawText(0,32, myTest, WHITE, BLACK,2);
 	TestReset(); 
 	
-} // end  DisplayText()
+} 
 
 // Function to display Graphics.
 void  DisplayGraphics()

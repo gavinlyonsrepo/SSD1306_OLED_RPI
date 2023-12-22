@@ -15,13 +15,15 @@
 SSD1306_graphics::SSD1306_graphics(int16_t w, int16_t h):
 	WIDTH(w), HEIGHT(h)
 {
-	_width    = WIDTH;
-	_height   = HEIGHT;
-	_cursor_y  = _cursor_x    = 0;
-	_rotation = 0;
+	_width     = WIDTH;
+	_height    = HEIGHT;
+	_cursor_y  = 0;
+	_cursor_x  = 0;
+	_rotation  = 0;
 	_textsize  = 1;
-	_textcolor = _textbgcolor = 0xFF;
-	_textwrap      = true;
+	_textcolor = 0x00;
+	_textbgcolor = 0xFF;
+	_textwrap  = true;
 }
 
 /*!
@@ -405,56 +407,43 @@ size_t SSD1306_graphics::write(uint8_t character)
 {
 	if (_FontNumber < OLEDFontType_Bignum)
 	{
-		if (character == '\n') {
-		_cursor_y += _textsize*_CurrentFontheight;
-		_cursor_x  = 0;
-		} else if (character== '\r') {
-		// skip 
-		} else {
-		drawChar(_cursor_x, _cursor_y, character, _textcolor, _textbgcolor, _textsize);
-		_cursor_x += _textsize*(_CurrentFontWidth+1);
-			if (_textwrap && (_cursor_x > (_width - _textsize*(_CurrentFontWidth+1)))) {
-			  _cursor_y += _textsize*_CurrentFontheight;
-			  _cursor_x = 0;
-			}
+		switch (character)
+		{
+		case '\n':
+			_cursor_y += _textsize*_CurrentFontheight;
+			_cursor_x  = 0;
+		break;
+		case'\r':/* skip */ break;
+		default:
+			drawChar(_cursor_x, _cursor_y, character, _textcolor, _textbgcolor, _textsize);
+			_cursor_x += _textsize*(_CurrentFontWidth+1);
+				if (_textwrap && (_cursor_x > (_width - _textsize*(_CurrentFontWidth+1)))) 
+				{
+				  _cursor_y += _textsize*_CurrentFontheight;
+				  _cursor_x = 0;
+				}
+		break;
 		}
-	}else if (_FontNumber == OLEDFontType_Bignum || _FontNumber == OLEDFontType_Mednum)
+	}else // for font numbers 7-10
 	{
-		uint8_t decPointRadius = 3;
-		uint8_t SkipSpace = 0;
-		if (_FontNumber == OLEDFontType_Mednum) decPointRadius = 2;
-		
 		switch (character)
 		{
 			case '\n': 
 				_cursor_y += _CurrentFontheight;
 				_cursor_x  = 0;
 			break;
-			case '\r': break;
-			case '.':  // draw a circle for decimal & point skip a space.
-				fillCircle(_cursor_x+(_CurrentFontWidth/2), _cursor_y + (_CurrentFontheight-6), decPointRadius, _textcolor);
-				SkipSpace = 1;
-			break;
-			case '-':  // draw a rect for negative number line and skip a space
-				fillRect(_cursor_x+2, _cursor_y + (_CurrentFontheight/2)-2 ,_CurrentFontWidth-4 , decPointRadius+1,  _textcolor);              
-				SkipSpace = 1;
-			break;
+			case '\r': /* skip */  break;
 			default:
-				drawCharNumFont(_cursor_x, _cursor_y, character, _textcolor, _textbgcolor);
-				SkipSpace = 1;
+				drawCharBigFont(_cursor_x, _cursor_y, character, _textcolor, _textbgcolor);
+				_cursor_x += (_CurrentFontWidth);
+				if (_textwrap && (_cursor_x  > (_width - (_CurrentFontWidth+1)))) 
+				{
+					_cursor_y += _CurrentFontheight;
+					_cursor_x = 0;
+				}
 			break;
 		} // end of switch
-		if (SkipSpace == 1)
-		{
-			_cursor_x += (_CurrentFontWidth+1);
-			if (_textwrap && (_cursor_x  > (_width - (_CurrentFontWidth+1)))) 
-			{
-				_cursor_y += _CurrentFontheight;
-				_cursor_x = 0;
-			}
-		}
-
-	}
+	} // end of else
   return 1;
 }
 
@@ -541,7 +530,7 @@ void SSD1306_graphics::setTextSize(uint8_t s) {
 
 /*! 
 	@brief set the text color  
-	@param c Color fo text 
+	@param c Color of text 
 */
 void SSD1306_graphics::setTextColor(uint8_t c) {
 	_textcolor = _textbgcolor = c;
@@ -612,8 +601,7 @@ void SSD1306_graphics::setRotation(uint8_t x) {
 
 /*!
 	@brief   Set the current font type
-	@param FontNumber 1-8 enum OLEDFontType_e
-	@note 1=default 2=thick 3=seven segment 4=wide 5=tiny 6=homespun 7=bignums 8=mednums
+	@param FontNumber 1-10 enum OLEDFontType_e
 */
 void SSD1306_graphics::setFontNum(OLEDFontType_e FontNumber) 
 {
@@ -652,12 +640,22 @@ void SSD1306_graphics::setFontNum(OLEDFontType_e FontNumber)
 	break;
 	case OLEDFontType_Bignum : // big nums 16 by 32 (NUMBERS + : only)
 		_CurrentFontWidth = OLEDFontWidth_16;
-		_CurrentFontoffset = OLEDFontOffset_Number;
+		_CurrentFontoffset = OLEDFontOffset_Minus;
 		_CurrentFontheight = OLEDFontHeight_32;
 	break; 
 	case OLEDFontType_Mednum: // med nums 16 by 16 (NUMBERS + : only)
 		_CurrentFontWidth = OLEDFontWidth_16;
-		_CurrentFontoffset =  OLEDFontOffset_Number;
+		_CurrentFontoffset =  OLEDFontOffset_Minus;
+		_CurrentFontheight = OLEDFontHeight_16;
+	break;
+	case OLEDFontType_ArialRound: // Arial round 16 by 24 
+		_CurrentFontWidth = OLEDFontWidth_16;
+		_CurrentFontoffset = OLEDFontOffset_Space;
+		_CurrentFontheight = OLEDFontHeight_24;
+	break;
+	case OLEDFontType_ArialBold: // Arial bold  16 by 16
+		_CurrentFontWidth = OLEDFontWidth_16;
+		_CurrentFontoffset = OLEDFontOffset_Space;
 		_CurrentFontheight = OLEDFontHeight_16;
 	break;
 	default: // if wrong font num passed in,  set to default
@@ -676,13 +674,13 @@ void SSD1306_graphics::setFontNum(OLEDFontType_e FontNumber)
 	@param c The ASCII character
 	@param color 
 	@param bg background color
-	@note for font 7,8 only
+	@note for font 7-10 only
 */
-void SSD1306_graphics::drawCharNumFont(uint8_t x, uint8_t y, uint8_t c, uint8_t color , uint8_t bg) 
+void SSD1306_graphics::drawCharBigFont(uint8_t x, uint8_t y, uint8_t c, uint8_t color , uint8_t bg) 
 {
 	if (_FontNumber < OLEDFontType_Bignum)
 	{
-		printf("Error: Wrong font selected, must be 7 or 8 \n");
+		printf("Error: Wrong font selected, must be 7 - 10 \n");
 		return;
 	}
 	
@@ -691,11 +689,13 @@ void SSD1306_graphics::drawCharNumFont(uint8_t x, uint8_t y, uint8_t c, uint8_t 
 
 	for (i = 0; i < _CurrentFontheight*2; i++) 
 	{
-		if (_FontNumber == OLEDFontType_Bignum){
-			ctemp = pFontBigNumptr[c - _CurrentFontoffset][i];
-		}
-		else if (_FontNumber == OLEDFontType_Mednum){
-			ctemp = pFontMedNumptr[c - _CurrentFontoffset][i];
+		switch (_FontNumber)
+		{
+			case OLEDFontType_Bignum: ctemp = pFontBigNumptr[c - _CurrentFontoffset][i]; break; 
+			case OLEDFontType_Mednum: ctemp = pFontMedNumptr[c - _CurrentFontoffset][i]; break;
+			case OLEDFontType_ArialRound: ctemp = pFontArial16x24ptr[c - _CurrentFontoffset][i]; break;
+			case OLEDFontType_ArialBold: ctemp = pFontArial16x16ptr[c - _CurrentFontoffset][i]; break;
+			default : return; break;
 		}
 		
 		for (j = 0; j < 8; j++) 
@@ -727,14 +727,14 @@ void SSD1306_graphics::drawCharNumFont(uint8_t x, uint8_t y, uint8_t c, uint8_t 
 	@param pText pointer to string of ASCII character's
 	@param color text color
 	@param bg background color
-	@note for font 7,8 only
+	@note for font 7-10 only
 */
-void SSD1306_graphics::drawTextNumFont(uint8_t x, uint8_t y, 
+void SSD1306_graphics::drawTextBigFont(uint8_t x, uint8_t y, 
 						char *pText, uint8_t color, uint8_t bg) 
 {
 	if (_FontNumber < OLEDFontType_Bignum)
 	{
-		printf("Error: Wrong font selected, must be 7 or 8 \n");
+		printf("Error: Wrong font selected, must be 7 -10 \n");
 		return;
 	}
 	while (*pText != '\0') 
@@ -748,7 +748,7 @@ void SSD1306_graphics::drawTextNumFont(uint8_t x, uint8_t y,
 				y = x = 0;
 			}
 		}
-		drawCharNumFont(x, y, *pText, color, bg);
+		drawCharBigFont(x, y, *pText, color, bg);
 		x += _CurrentFontWidth ;
 		pText++;
 	}

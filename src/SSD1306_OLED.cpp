@@ -24,29 +24,36 @@ SSD1306  :: SSD1306(int16_t oledwidth, int16_t oledheight) :SSD1306_graphics(ole
 
 /*!
 	@brief  begin Method initialise OLED
-	@param I2C_speed default = 0 , 0 = bcm2835_i2c_set_baudrate(100000) 100k baudrate,  > 0 = BCM2835_I2C_CLOCK_DIVIDER, choices = 2500 , 622 , 150 , 148
+	@param I2C_speed default=0 , 0=bcm2835_i2c_set_baudrate(100000) 100k baudrate, >0 = BCM2835_I2C_CLOCK_DIVIDER,choices=2500 ,622 ,150 ,148
 	@param I2c_address by default 0x3C
+	@param I2c_debug default false
 */
-void SSD1306::OLEDbegin( uint16_t I2C_speed , uint8_t I2c_address)
+void SSD1306::OLEDbegin( uint16_t I2C_speed , uint8_t I2c_address, bool I2c_debug)
 {
 	_I2C_speed = I2C_speed;
 	_I2C_address = I2c_address;
-	OLED_I2C_ON();
+	_I2C_DebugFlag = I2c_debug;
+	OLED_I2C_Settings();
 	OLEDinit();
-	OLED_I2C_OFF();
 }
 
 /*!
 	@brief  Start I2C operations. Forces RPi I2C pins P1-03 (SDA) and P1-05 (SCL) 
 	to alternate function ALT0, which enables those pins for I2C interface. 
 */
-void SSD1306::OLED_I2C_ON()
+bool SSD1306::OLED_I2C_ON()
 {
 	if (!bcm2835_i2c_begin())
-	{
-		printf("Error: Cannot start I2C, Running root?\n");
-		return;
-	}
+		return false;
+	else
+		return true;
+}
+
+/*! 
+	@brief Sets the address and speed I2C bus , should be called before all writes.
+*/
+void SSD1306::OLED_I2C_Settings()
+{
 	bcm2835_i2c_setSlaveAddress(_I2C_address);  //i2c address
 	
 	if ( _I2C_speed > 0)  
@@ -61,13 +68,22 @@ void SSD1306::OLED_I2C_ON()
 }
 
 /*!
+	@brief getter to read I2C bus speed
+	@return I2C bus speed see Readme for details
+*/
+uint16_t SSD1306::getI2Cspeed(void){return _I2C_speed;}
+
+/*!
+	@brief setter to set I2C bus speed
+	@param I2CSpeed I2C bus speed see Readme for details
+*/
+void SSD1306::setI2Cspeed(uint16_t I2CSpeed){_I2C_speed = I2CSpeed;}
+
+/*!
 	@brief End I2C operations. I2C pins P1-03 (SDA) and P1-05 (SCL) 	
 	are returned to their default INPUT behaviour. 
 */
-void SSD1306::OLED_I2C_OFF(void)
-{
-	bcm2835_i2c_end();
-}
+void SSD1306::OLED_I2C_OFF(void){bcm2835_i2c_end();}
 
 /*! 
 	@brief Disables  OLED Call when powering down
@@ -140,9 +156,8 @@ switch (_OLED_HEIGHT)
 */
 void SSD1306::OLEDEnable(uint8_t bits)
 {
-	OLED_I2C_ON();
+	OLED_I2C_Settings();
 	bits ? SSD1306_command(SSD1306_DISPLAY_ON) : SSD1306_command(SSD1306_DISPLAY_OFF);
-	OLED_I2C_OFF();
 }
 
 /*!
@@ -151,10 +166,9 @@ void SSD1306::OLEDEnable(uint8_t bits)
 */
 void SSD1306::OLEDContrast(uint8_t contrast)
 {
-	OLED_I2C_ON();
+	OLED_I2C_Settings();
 	SSD1306_command( SSD1306_SET_CONTRAST_CONTROL );
 	SSD1306_command(contrast);
-	OLED_I2C_OFF();
 }
 
 /*!
@@ -163,9 +177,8 @@ void SSD1306::OLEDContrast(uint8_t contrast)
 */
 void SSD1306::OLEDInvert(bool value)
 {
- OLED_I2C_ON();
- value ? SSD1306_command( SSD1306_INVERT_DISPLAY ) : SSD1306_command( SSD1306_NORMAL_DISPLAY );
- OLED_I2C_OFF();
+	OLED_I2C_Settings();
+	value ? SSD1306_command( SSD1306_INVERT_DISPLAY ) : SSD1306_command( SSD1306_NORMAL_DISPLAY );
 }
 
 /*!
@@ -175,7 +188,7 @@ void SSD1306::OLEDInvert(bool value)
 */
 void SSD1306::OLEDFillScreen(uint8_t dataPattern, uint8_t delay)
 {
-	OLED_I2C_ON();
+	OLED_I2C_Settings();
 	for (uint8_t row = 0; row < _OLED_PAGE_NUM; row++)
 	{
 		SSD1306_command( 0xB0 | row);
@@ -187,7 +200,6 @@ void SSD1306::OLEDFillScreen(uint8_t dataPattern, uint8_t delay)
 			bcm2835_delay(delay);
 		}
 	}
-	OLED_I2C_OFF();
 }
 
 /*!
@@ -198,7 +210,7 @@ void SSD1306::OLEDFillScreen(uint8_t dataPattern, uint8_t delay)
 */
 void SSD1306::OLEDFillPage(uint8_t page_num, uint8_t dataPattern,uint8_t mydelay)
 {
-	OLED_I2C_ON();
+	OLED_I2C_Settings();
 	uint8_t Result =0xB0 | page_num; 
 	SSD1306_command(Result);
 	SSD1306_command(SSD1306_SET_LOWER_COLUMN);
@@ -209,7 +221,6 @@ void SSD1306::OLEDFillPage(uint8_t page_num, uint8_t dataPattern,uint8_t mydelay
 		SSD1306_data(dataPattern);
 		bcm2835_delay(mydelay);
 	}
-	OLED_I2C_OFF();
 }
 
 /*!
@@ -267,12 +278,14 @@ void SSD1306::I2C_Write_Byte(uint8_t value, uint8_t cmd)
 	uint8_t returnCode = 0;
 	
 	returnCode = bcm2835_i2c_write(buf, 2); 
-	
 	while(returnCode != 0)
 	{ // failure to write I2C byte 
 		attemptI2Cwrite ++;
-		printf("Error I2C: Cannot Write byte :: %u\n", attemptI2Cwrite);
-		printf("bcm2835I2CReasonCodes :: Error code %u\n", returnCode);
+		if (_I2C_DebugFlag == true)
+		{
+			printf("Error I2C_Write_Byte : Cannot Write byte attempt no :: %u\n", attemptI2Cwrite);
+			printf("bcm2835I2CReasonCodes :: Error code :: %u\n", returnCode);
+		}
 		returnCode  = bcm2835_i2c_write(buf, 2);
 		bcm2835_delay(100); // mS
 		if (attemptI2Cwrite >= 3) break;
@@ -293,9 +306,7 @@ void SSD1306::OLEDupdate()
 */
 void SSD1306::OLEDclearBuffer()
 {
-
 	memset( this->buffer, 0x00, (this->bufferWidth * (this->bufferHeight /8))  );
-
 }
 
 /*!
@@ -309,7 +320,7 @@ void SSD1306::OLEDclearBuffer()
 */
 void SSD1306::OLEDBuffer(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t* data)
 {
-	OLED_I2C_ON();
+	OLED_I2C_Settings();
 	uint8_t tx, ty;
 	uint16_t offset = 0;
 		
@@ -338,7 +349,6 @@ void SSD1306::OLEDBuffer(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t* da
 			SSD1306_data(data[offset++]);
 		}
 	}
-	OLED_I2C_OFF();
 
 }
 
@@ -385,9 +395,9 @@ void SSD1306::drawPixel(int16_t x, int16_t y, uint8_t color)
 	@param start start position
 	@param stop stop position 
 */
-void SSD1306::OLED_StartScrollRight(uint8_t start, uint8_t stop) 
+void SSD1306::OLEDStartScrollRight(uint8_t start, uint8_t stop) 
 {
-	OLED_I2C_ON();
+	OLED_I2C_Settings();
 	SSD1306_command(SSD1306_RIGHT_HORIZONTAL_SCROLL);
 	SSD1306_command(0X00);
 	SSD1306_command(start);  // start page
@@ -396,7 +406,6 @@ void SSD1306::OLED_StartScrollRight(uint8_t start, uint8_t stop)
 	SSD1306_command(0X00);
 	SSD1306_command(0XFF);
 	SSD1306_command(SSD1306_ACTIVATE_SCROLL);
-	OLED_I2C_OFF();
 }
 
 /*!
@@ -404,9 +413,9 @@ void SSD1306::OLED_StartScrollRight(uint8_t start, uint8_t stop)
 	@param start start position
 	@param stop stop position 
 */
-void SSD1306::OLED_StartScrollLeft(uint8_t start, uint8_t stop) 
+void SSD1306::OLEDStartScrollLeft(uint8_t start, uint8_t stop) 
 {
-	OLED_I2C_ON();
+	OLED_I2C_Settings();
 	SSD1306_command(SSD1306_LEFT_HORIZONTAL_SCROLL);
 	SSD1306_command(0X00);
 	SSD1306_command(start);
@@ -415,7 +424,6 @@ void SSD1306::OLED_StartScrollLeft(uint8_t start, uint8_t stop)
 	SSD1306_command(0X00);
 	SSD1306_command(0XFF);
 	SSD1306_command(SSD1306_ACTIVATE_SCROLL);
-	OLED_I2C_OFF();
 }
 
 /*!
@@ -423,9 +431,9 @@ void SSD1306::OLED_StartScrollLeft(uint8_t start, uint8_t stop)
 	@param start start position
 	@param stop stop position 
 */
-void SSD1306::OLED_StartScrollDiagRight(uint8_t start, uint8_t stop) 
+void SSD1306::OLEDStartScrollDiagRight(uint8_t start, uint8_t stop) 
 {
-	OLED_I2C_ON();
+	OLED_I2C_Settings();
 	SSD1306_command(SSD1306_SET_VERTICAL_SCROLL_AREA);
 	SSD1306_command(0X00);
 	SSD1306_command(_OLED_HEIGHT);
@@ -436,7 +444,6 @@ void SSD1306::OLED_StartScrollDiagRight(uint8_t start, uint8_t stop)
 	SSD1306_command(stop);
 	SSD1306_command(0X01);
 	SSD1306_command(SSD1306_ACTIVATE_SCROLL);
-	OLED_I2C_OFF();
 }
 
 /*!
@@ -444,9 +451,9 @@ void SSD1306::OLED_StartScrollDiagRight(uint8_t start, uint8_t stop)
 	@param start start position
 	@param stop stop position 
 */
-void SSD1306::OLED_StartScrollDiagLeft(uint8_t start, uint8_t stop) 
+void SSD1306::OLEDStartScrollDiagLeft(uint8_t start, uint8_t stop) 
 {
-	OLED_I2C_ON();
+	OLED_I2C_Settings();
 	SSD1306_command(SSD1306_SET_VERTICAL_SCROLL_AREA);
 	SSD1306_command(0X00);
 	SSD1306_command(_OLED_HEIGHT);
@@ -457,18 +464,22 @@ void SSD1306::OLED_StartScrollDiagLeft(uint8_t start, uint8_t stop)
 	SSD1306_command(stop);
 	SSD1306_command(0X01);
 	SSD1306_command(SSD1306_ACTIVATE_SCROLL);
-	OLED_I2C_OFF();
 }
 
 /*!
 	@brief  Stop scroll mode
 */
-void SSD1306::OLED_StopScroll(void) 
+void SSD1306::OLEDStopScroll(void) 
 {
-	OLED_I2C_ON();
+	OLED_I2C_Settings();
 	SSD1306_command(SSD1306_DEACTIVATE_SCROLL);
-	OLED_I2C_OFF();
 }
+
+/*!
+	@brief  get the SSD1306 library version number 
+	@return the library version number eg 150 = 1.5.0
+*/
+uint16_t SSD1306::getLibVerNum(void){return _LibraryVersionNum;}
 
 
 // ---  EOF ---
