@@ -46,13 +46,12 @@
 
 ## Installation
 
-1. Make sure I2C bus is enabled on your raspberry PI
 
-2. Install the dependency bcm2835 Library if not installed (at time of writing latest version is 1.73.)
+1. Install the dependency bcm2835 Library if not installed (at time of writing latest version is 1.73.)
 	* The bcm2835 library is a dependency and provides I2C bus, delays and GPIO control.
 	* Install the C libraries of bcm2835, [Installation instructions here](http://www.airspayce.com/mikem/bcm2835/)
 
-3. Download the SSD1306_OLED_RPI library 
+2. Download the SSD1306_OLED_RPI library 
 	* Open a Terminal in a folder where you want to download,build & test library
 	* Run following command to download from github.
     
@@ -60,7 +59,7 @@
 curl -sL https://github.com/gavinlyonsrepo/SSD1306_OLED_RPI/archive/1.5.tar.gz | tar xz
 ```
 
-4. Run "make" to run the makefile in repo base folder to install library, it will be 
+3. Run "make" to run the makefile in repo base folder to install library, it will be 
     installed to usr/lib and usr/include
     
 ```sh
