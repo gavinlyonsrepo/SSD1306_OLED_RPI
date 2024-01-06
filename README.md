@@ -185,12 +185,7 @@ Output of the example file "CLOCK_DEMO".
 
 ## Notes
 
-1. Note the toolchain used in Overview section, If you have trouble compiling on other 
-platforms or OS. For example 64-bit OS, user may need to remove or edit
-the CCFLAGS in root directory Makefile to allow for Compilation.
-See Pull request number 2 on github.
-
-2. To test on a different size of display edit the myOLEDwidth & myOLEDheight
+1. To test on a different size of display edit the myOLEDwidth & myOLEDheight
 variables in examples files.
 
 | Display size | Supported | Tested | 
