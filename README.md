@@ -15,7 +15,7 @@
 	* [Fonts](#fonts)
 	* [Bitmaps](#bitmaps)
   * [Output](#output)
-  * [Notes](#notes)
+  * [Notes and issues](#notes-and-issues)
 
 
 ## Overview
@@ -41,13 +41,13 @@
 	1. Raspberry PI 3 model b, 
 	2. C++ complier g++ (Raspbian 8.3.0-6)
 	3. Raspbian 10 buster OS, 32 bit.
-	4. bcm2835 Library 1.73 (Dependency)
+	4. bcm2835 Library 1.71 (Dependency)
 
 
 ## Installation
 
 
-1. Install the dependency bcm2835 Library if not installed (at time of writing latest version is 1.73.)
+1. Install the dependency bcm2835 Library if not installed (See Notes and issues)
 	* The bcm2835 library is a dependency and provides I2C bus, delays and GPIO control.
 	* Install the C libraries of bcm2835, [Installation instructions here](http://www.airspayce.com/mikem/bcm2835/)
 
@@ -183,9 +183,13 @@ Output of the example file "CLOCK_DEMO".
 
 ![ op ](https://github.com/gavinlyonsrepo/SSD1306_OLED_RPI/blob/main/extras/image/output.jpg)
 
-## Notes
+## Notes and issues
 
-1. To test on a different size of display edit the myOLEDwidth & myOLEDheight
+1. If you upgrade to V 1.73 of the bcm2835 dependancy (the latest at time  of writing ) you may see Intermittant 
+BCM2835_I2C_REASON_ERROR_TIMEOUT  [errors on I2C write operations](https://groups.google.com/g/bcm2835/c/45O8Y_5yv00). Best stay on 1.71 until a new upgrade is released.
+
+
+2. To test on a different size of display edit the myOLEDwidth & myOLEDheight
 variables in examples files.
 
 | Display size | Supported | Tested | 
