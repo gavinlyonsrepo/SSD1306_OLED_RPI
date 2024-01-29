@@ -13,7 +13,9 @@ SRC=src/HELLO_WORLD
 #SRC=src/OLED_FUNCTIONS
 #SRC=src/SPEED_TEST
 #SRC=src/TEXT_GRAPHICS
+#SRC=src/I2C_TEST
 # ************************************************
+
 
 # ********************
 # Options
@@ -24,7 +26,7 @@ SRC=src/HELLO_WORLD
 
 CC=g++
 LDFLAGS= -lbcm2835 -lrt -lSSD1306_OLED_RPI 
-CFLAGS = -Iinclude/ -c -Wall 
+CFLAGS = -Iinclude/ -c -Wall -Wextra 
 MD=mkdir
 OBJ=obj
 SRCS = $(wildcard $(SRC)/*.cpp)

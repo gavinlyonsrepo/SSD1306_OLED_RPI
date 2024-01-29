@@ -19,20 +19,23 @@
 		-# I2C_Speed = 148 FPS 25 bcm2835_i2c_setClockDivider(BCM2835_I2C_CLOCK_DIVIDER_148) 
 */
 
-#include <time.h>
-#include <stdio.h>
+#include <ctime>
+#include <cstdio>
 #include <bcm2835.h>
 #include "SSD1306_OLED.hpp"
 
 #define myOLEDwidth  128
 #define myOLEDheight 64
+#define FULLSCREEN (myOLEDwidth * (myOLEDheight/8))
 SSD1306 myOLED(myOLEDwidth ,myOLEDheight) ; // instantiate  an object
 
 // vars for the test
 uint16_t count  = 0;
+uint16_t countLimit = 1000;
 bool colour = 1;
 uint64_t  previousCounter =0;
-uint8_t  screenBuffer[myOLEDwidth * (myOLEDheight / 8) ]; 
+uint8_t  screenBuffer[FULLSCREEN]; 
+
 
 // =============== Function prototype ================
 bool SetupTest(void); 
@@ -43,7 +46,7 @@ static uint64_t counter( void );
 
 	
 // ======================= Main ===================
-int main(int argc, char **argv)
+int main(void)
 {
 
 	if (SetupTest() != true) return -1;
@@ -61,57 +64,49 @@ void EndTests()
 	printf("OLED End\r\n");
 }
 
-bool SetupTest() 
+bool SetupTest()
 {
-	const uint16_t I2C_Speed = 626; //  bcm2835I2CClockDivider enum , see readme.
+	const uint16_t I2C_Speed = BCM2835_I2C_CLOCK_DIVIDER_626;; // bcm2835I2CClockDivider enum ,see readme.
 	const uint8_t I2C_Address = 0x3C;
 	bool I2C_debug = false;
-	
 	printf("OLED Test Begin\r\n");
-	printf("SSD1306 library Version Number :: %u\r\n",myOLED.getLibVerNum());
 	// Check if Bcm28235 lib installed and print version.
 	if(!bcm2835_init())
 	{
 		printf("Error 1201: init bcm2835 library , Is it installed ?\r\n");
 		return false;
-	}else
-	{
-		printf("bcm2835 library Version Number :: %u\r\n",bcm2835_version());
-		bcm2835_delay(100);
 	}
-	
-	// Turn on I2C bus.
-	while(myOLED.OLED_I2C_ON() != true)
+	bcm2835_delay(250);
+	// Turn on I2C bus (optional it may already be on)
+	if(!myOLED.OLED_I2C_ON())
 	{
 		printf("Error 1202: bcm2835_i2c_begin :Cannot start I2C, Running as root?\n");
-		bcm2835_delay(1500);
+		bcm2835_close(); // Close the library
+		return false;
 	}
 	
+	printf("bcm2835 library Version Number :: %u\r\n",bcm2835_version());
+	printf("SSD1306 library Version Number :: %u\r\n",myOLED.getLibVerNum());
 	myOLED.OLEDbegin(I2C_Speed, I2C_Address, I2C_debug); // initialize the OLED
-	myOLED.OLEDFillScreen(0xF0, 0); // splash screen bars, optional just for effect
+	myOLED.OLEDFillScreen(0xF1, 0); // splash screen bars, optional just for effect
 	bcm2835_delay(1000);
+	
 	return true;
 }
 
-void myLoop() {
-
-		printf("OLED Frame rate per second test , ends at 1000\r\n");
+void myLoop() 
+{
+		printf("OLED Frame rate per second(FPS) test , ends at 'countLimit' \r\n");
 		myOLED.setTextColor(WHITE);
 		myOLED.setTextSize(1);
-		myOLED.buffer = (uint8_t*) &screenBuffer;  
-		if(myOLED.buffer == nullptr)
-		{
-			printf("Error 1203 :: Problem assigning buffer pointer\r\n");
-			exit(-1);
-		}
-		while (count < 1000)
+		if (!myOLED.OLEDSetBufferPtr(myOLEDwidth, myOLEDheight, screenBuffer, sizeof(screenBuffer))) return;
+		while (count < countLimit)
 		{
 			static long framerate = 0;
 			display_buffer(framerate, count);
 			framerate++;
 			count++;
 		}
-
 }
 
 void display_buffer(long currentFramerate, int count)
@@ -131,6 +126,7 @@ void display_buffer(long currentFramerate, int count)
 	
 	myOLED.OLEDclearBuffer();
 	
+	// ** TEST CODE **
 	myOLED.setCursor(0, 0);
 	myOLED.print("SSD1306");
 	myOLED.setCursor(0, 10);
@@ -146,17 +142,17 @@ void display_buffer(long currentFramerate, int count)
 	myOLED.print(fps);
 	myOLED.print(" fps");
 
-	
 	myOLED.drawFastVLine(64, 0, 63, WHITE);
 	myOLED.fillRect(70, 10, 20, 20, colour);
 	myOLED.fillCircle(110, 20, 10, !colour);
 	myOLED.drawRoundRect(80, 40, 40, 20, 10, WHITE);
-
+	// ** END of TEST CODE ** 
+	
 	myOLED.OLEDupdate();
 }
 
 // This func returns nano-seconds as a 64-bit unsigned number, 
-// monotonically increasing, probably since system boot.
+// monotonically increasing, since system boot.
 // The actual resolution looks like microseconds. returns nanoseconds
 static uint64_t counter( void )
 {
