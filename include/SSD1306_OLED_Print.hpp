@@ -6,9 +6,10 @@
  
 #pragma once
 
-#include <inttypes.h>
-#include <stdio.h> // for size_t
-#include <string.h>
+#include <cstdint>
+#include <cstdio> // for size_t
+#include <cstring>
+#include <cmath>
 #include <string>
 
 #define DEC 10

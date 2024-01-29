@@ -9,15 +9,14 @@
 
 // Library includes
 
-#include <stdio.h>
-#include <stdint.h>
-#include <stdbool.h>
-#include <string.h>
+#include <cstdio>
+#include <cstdint>
+#include <cstdbool>
 #include <bcm2835.h>
 #include "SSD1306_OLED_graphics.hpp"
 
 
-//  SSD1306 Command Set  
+//  SSD1306 Command Set
 
 // Fundamental Commands
 #define SSD1306_SET_CONTRAST_CONTROL    0x81
@@ -64,7 +63,7 @@
 #define SSD1306_COMMAND        0x00
 #define SSD1306_DATA           0xC0
 #define SSD1306_DATA_CONTINUE  0x40
-#define SSD1306_ADDR           0x3C  /**< I2C address alt 0x3D */ 
+#define SSD1306_ADDR           0x3C  /**< I2C address alt 0x3D */
 
 #define SSD1306_command(Reg)  I2C_Write_Byte(Reg, SSD1306_COMMAND)
 #define SSD1306_data(Data)    I2C_Write_Byte(Data, SSD1306_DATA_CONTINUE)
@@ -78,7 +77,7 @@
 #define SSD1306_INITDELAY 100 /**< Initialisation delay in mS */
 
 
-/*! 
+/*!
 	@brief class to control OLED and define buffer
 */
 class SSD1306 : public SSD1306_graphics  {
@@ -86,55 +85,70 @@ class SSD1306 : public SSD1306_graphics  {
 	SSD1306(int16_t oledwidth, int16_t oledheight);
 	~SSD1306(){};
 
-	uint8_t* buffer = nullptr;  /**< Buffer to hold screen data */
-
 	virtual void drawPixel(int16_t x, int16_t y, uint8_t color) override;
 	void OLEDupdate(void);
 	void OLEDclearBuffer(void);
-	void OLEDBuffer(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t* data);
+	void OLEDBufferScreen(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t* data);
 	void OLEDFillScreen(uint8_t pixel, uint8_t mircodelay);
 	void OLEDFillPage(uint8_t page_num, uint8_t pixels,uint8_t delay);
-	void OLEDBitmap(int16_t x, int16_t y, int16_t w, int16_t h, const uint8_t* data, bool invert);
-	
+	OLED_Return_Codes_e  OLEDBitmap(int16_t x, int16_t y, int16_t w, int16_t h, const uint8_t* data, bool invert);
+
 	void OLEDbegin(uint16_t I2C_speed = 0, uint8_t I2c_address= SSD1306_ADDR , bool I2C_debug = false);
+	bool OLEDSetBufferPtr(uint8_t width, uint8_t height , uint8_t* pBuffer, uint16_t sizeOfBuffer);
 	void OLEDinit(void);
 	void OLEDPowerDown(void);
-	
+
 	void OLEDEnable(uint8_t on);
 	void OLEDContrast(uint8_t OLEDcontrast);
 	void OLEDInvert(bool on);
-	
-	void OLEDStartScrollRight(uint8_t start, uint8_t stop); 
+
+	void OLEDStartScrollRight(uint8_t start, uint8_t stop);
 	void OLEDStartScrollLeft(uint8_t start, uint8_t stop) ;
 	void OLEDStartScrollDiagRight(uint8_t start, uint8_t stop) ;
 	void OLEDStartScrollDiagLeft(uint8_t start, uint8_t stop) ;
 	void OLEDStopScroll(void) ;
-	
+
 	bool OLED_I2C_ON(void);
 	void OLED_I2C_Settings(void);
 	void OLED_I2C_OFF(void);
-	
+
 	uint16_t getI2Cspeed(void);
 	void setI2Cspeed(uint16_t);
-	
+
+	uint8_t OLEDCheckConnection(void);
+
+	uint8_t OLEDI2CErrorGet(void);
+
+	uint16_t OLEDI2CErrorTimeoutGet(void);
+	void OLEDI2CErrorTimeoutSet(uint16_t);
+
+	uint8_t OLEDI2CErrorRetryNumGet(void);
+	void OLEDI2CErrorRetryNumSet(uint8_t);
+
+	bool OLEDDebugGet(void);
+	void OLEDDebugSet(bool);
+
 	uint16_t getLibVerNum(void);
-	
+
   private:
 
 	void I2C_Write_Byte(uint8_t value, uint8_t Cmd);
-	
-	uint16_t _I2C_speed = 0 ;             /**< Speed of I2C bus interface */
+
+	uint16_t _I2C_speed =  BCM2835_I2C_CLOCK_DIVIDER_626 ; /**< Speed of I2C bus interface */
 	uint8_t _I2C_address = SSD1306_ADDR ; /**< I2C address */
 	bool _I2C_DebugFlag = false; /**< I2C debug flag default false  */
-	
-	uint16_t _LibraryVersionNum = 150; /**< Library version number */
-	
+	uint16_t _I2C_ErrorDelay = 100; /**<I2C delay(in between retry attempts) in event of error in mS*/
+	uint8_t _I2C_ErrorRetryNum = 3; /**< In event of I2C error number of retry attempts*/
+	uint8_t _I2C_ErrorFlag = 0x00; /**< In event of I2C error holds bcm2835 I2C reason code 0x00 = success*/
+
+	uint16_t _LibraryVersionNum = 160; /**< Library version number */
+
 	int16_t _OLED_WIDTH;      /**< Width of OLED Screen in pixels */
 	int16_t _OLED_HEIGHT;    /**< Height of OLED Screen in pixels */
-	int8_t _OLED_PAGE_NUM; /**< Number of byte size pages OLED screen is divided into */ 
-	uint8_t bufferWidth ;      /**< Width of Screen Buffer */ 
+	int8_t _OLED_PAGE_NUM; /**< Number of byte size pages OLED screen is divided into */
+	uint8_t bufferWidth ;      /**< Width of Screen Buffer */
 	uint8_t bufferHeight ;    /**< Height of Screen Buffer */
-	
-	
 
-}; 
+	uint8_t* OLEDbuffer = nullptr; /**< pointer to buffer which holds screen data */
+
+};

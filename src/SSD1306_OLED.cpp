@@ -6,14 +6,13 @@
 */
 
 #include "SSD1306_OLED.hpp"
-#include <stdbool.h>
 
 /*!
 	@brief init the screen object
 	@param oledwidth width of OLED in pixels 
-	@param oledwidth height of OLED in pixels 
- */
-SSD1306  :: SSD1306(int16_t oledwidth, int16_t oledheight) :SSD1306_graphics(oledwidth, oledheight)
+	@param oledheight height of OLED in pixels 
+*/
+SSD1306::SSD1306(int16_t oledwidth, int16_t oledheight) :SSD1306_graphics(oledwidth, oledheight)
 {
 	_OLED_HEIGHT = oledheight;
 	_OLED_WIDTH = oledwidth;
@@ -38,6 +37,32 @@ void SSD1306::OLEDbegin( uint16_t I2C_speed , uint8_t I2c_address, bool I2c_debu
 }
 
 /*!
+	@brief sets the buffer pointer to the users screen data buffer
+	@param width width of buffer in pixels
+	@param height height of buffer in pixels
+	@param pBuffer the buffer array which decays to pointer
+	@param sizeOfBuffer size of buffer
+	@return Will return true for success false for failures : ,
+		Buffer size calculations are incorrect BufferSize = w * (h/8),
+		or not a valid pointer object.
+*/
+bool SSD1306::OLEDSetBufferPtr(uint8_t width, uint8_t height , uint8_t* pBuffer, uint16_t sizeOfBuffer)
+{
+	if(sizeOfBuffer !=  width * (height/8))
+	{
+		printf("Error OLEDSetBufferPtr 1: buffer size does not equal : width * (height/8))\n");
+		return false;
+	}
+	OLEDbuffer = pBuffer;
+	if(OLEDbuffer ==  nullptr)
+	{
+		printf("Error OLEDSetBufferPtr 2: Problem assigning buffer pointer, not a valid pointer object\r\n");
+		return false;
+	}
+	return true;
+}
+
+/*!
 	@brief  Start I2C operations. Forces RPi I2C pins P1-03 (SDA) and P1-05 (SCL) 
 	to alternate function ALT0, which enables those pins for I2C interface. 
 */
@@ -55,15 +80,31 @@ bool SSD1306::OLED_I2C_ON()
 void SSD1306::OLED_I2C_Settings()
 {
 	bcm2835_i2c_setSlaveAddress(_I2C_address);  //i2c address
-	
-	if ( _I2C_speed > 0)  
+	uint32_t I2CBaudRate = 100000;// 100K 
+	// BCM2835_I2C_CLOCK_DIVIDER enum choice 2500 626 150 148
+	// Clock divided is based on nominal base clock rate of 250MHz
+	switch(_I2C_speed)
 	{
-		// BCM2835_I2C_CLOCK_DIVIDER enum choice  2500 622 150 148
-		// Clock divided is based on nominal base clock rate of 250MHz
-		bcm2835_i2c_setClockDivider(_I2C_speed);
-	} else{
-		// default or use set_baudrate instead of clockdivder 100k
-		bcm2835_i2c_set_baudrate(100000); //100k baudrate
+		case 0:
+			// default or use set_baudrate instead of clockdivder 100k if zero passed
+			bcm2835_i2c_set_baudrate(I2CBaudRate); 
+		break;
+		case BCM2835_I2C_CLOCK_DIVIDER_2500:// ~100K
+		case BCM2835_I2C_CLOCK_DIVIDER_626: // ~400k
+		case BCM2835_I2C_CLOCK_DIVIDER_150:
+		case BCM2835_I2C_CLOCK_DIVIDER_148:
+			bcm2835_i2c_setClockDivider(_I2C_speed);
+		break;
+		default:
+			// error message 
+			if (_I2C_DebugFlag == true)
+			{
+				printf("Warning OLED_I2C_Settings 610: Invalid BCM2835_I2C_CLOCK_DIVIDER value : %u\n", _I2C_speed);
+				printf("	Must be 2500 626 150 or 148 \n");
+				printf("	Setting I2C baudrate to 100K with bcm2835_i2c_set_baudrate:\n");
+			}
+			bcm2835_i2c_set_baudrate(I2CBaudRate); 
+		break; 
 	}
 }
 
@@ -108,7 +149,7 @@ void SSD1306::OLEDinit()
 	SSD1306_command( _OLED_HEIGHT - 1 );
 	SSD1306_command( SSD1306_SET_DISPLAY_OFFSET );
 	SSD1306_command(0x00);
-	SSD1306_command( SSD1306_SET_START_LINE|0x00);
+	SSD1306_command( SSD1306_SET_START_LINE);
 	SSD1306_command( SSD1306_CHARGE_PUMP );
 	SSD1306_command(0x14);
 	SSD1306_command( SSD1306_MEMORY_ADDR_MODE );
@@ -130,9 +171,9 @@ switch (_OLED_HEIGHT)
 		SSD1306_command( SSD1306_SET_CONTRAST_CONTROL );
 		SSD1306_command(0x8F);
 	break;
-	case 16: // NOTE: not tested, lacking part. 
+	case 16: // NOTE: not tested, lacking part.
 		SSD1306_command( SSD1306_SET_COM_PINS );
-		SSD1306_command( 0x2 ); // ?
+		SSD1306_command( 0x2 );
 		SSD1306_command( SSD1306_SET_CONTRAST_CONTROL );
 		SSD1306_command(0xAF);
 	break;
@@ -230,66 +271,97 @@ void SSD1306::OLEDFillPage(uint8_t page_num, uint8_t dataPattern,uint8_t mydelay
 	@param w width 0-128
 	@param h height 0-64
 	@param data pointer to bitmap data
-	@param invert color 
-	@note bitmap data must be  horizontally addressed.
+	@param invert color
+	@return OLED_Return_Codes_e
+	@note bitmap data must be horizontally addressed.
 */
-void SSD1306::OLEDBitmap(int16_t x, int16_t y, int16_t w, int16_t h, const uint8_t* data, bool invert)
+OLED_Return_Codes_e  SSD1306::OLEDBitmap(int16_t x, int16_t y, int16_t w, int16_t h, const uint8_t* data, bool invert)
 {
 
-int16_t byteWidth = (w + 7) / 8; 
-uint8_t byte = 0;
-uint8_t color, bgcolor;
-if (invert == false)
-{
-	color = WHITE;
-	bgcolor = BLACK;
-}else
-{
-	color = BLACK;
-	bgcolor = WHITE;
-}
-
-for (int16_t j = 0; j < h; j++, y++) 
-{
-	for (int16_t i = 0; i < w; i++) 
+	// User error checks
+	// 1. Completely out of bounds?
+	if (x > _width || y > _height)
 	{
-		if (i & 7)
-			byte <<= 1;
-		else
-			byte = data[j * byteWidth + i / 8];
-			
-		drawPixel(x + i, y, (byte & 0x80) ? color : bgcolor );
+		printf("Error drawBitmap 1: Bitmap co-ord out of bounds, check x and y\r\n");
+		return OLED_BitmapScreenBounds ;
 	}
-}
+	// 2. bitmap weight and height
+	if (w > _width || h > _height)
+	{
+		printf("Error drawBitmap 2: Bitmap is larger than screen, check w and h\r\n");
+		return OLED_BitmapLargerThanScreen;
+	}
+	// 3. bitmap is null
+	if(data== nullptr)
+	{
+		printf("Error drawBitmap 3: Bitmap is is not valid pointer\r\n");
+		return OLED_BitmapNullptr;
+	}
 
+	// 4.check bitmap width size
+	if(w % 8 != 0)
+	{
+		printf("Error drawBitmap 4: Bitmap width size is incorrect must be divisible evenly by 8: %u\r\n", w);
+		return OLED_BitmapHorizontalSize;
+	}
+
+	int16_t byteWidth = (w + 7) / 8; 
+	uint8_t byte = 0;
+	uint8_t color, bgcolor;
+	if (invert == false)
+	{
+		color = WHITE;
+		bgcolor = BLACK;
+	}else
+	{
+		color = BLACK;
+		bgcolor = WHITE;
+	}
+
+	for (int16_t j = 0; j < h; j++, y++) 
+	{
+		for (int16_t i = 0; i < w; i++) 
+		{
+			if (i & 7)
+				byte <<= 1;
+			else
+				byte = data[j * byteWidth + i / 8];
+				
+			drawPixel(x + i, y, (byte & 0x80) ? color : bgcolor );
+		}
+	}
+	return OLED_Success;
 }
 
 /*!
 	@brief Writes a byte to I2C address,command or data, used internally
 	@param value write the value to be written
 	@param cmd command or data
-	@note In the event of an error will loop 3 times each time.
+	@note In the event of an error will loop  _I2C_ErrorRetryNum times each time.with delay _I2C_ErrorDelay
 	Printing the error code , see bcm2835I2CReasonCodes in bcm2835 docs.
 */
 void SSD1306::I2C_Write_Byte(uint8_t value, uint8_t cmd)
 {
-	char buf[2] = {cmd,value};
-	uint8_t attemptI2Cwrite = 0;
-	uint8_t returnCode = 0;
+	char ByteBuffer[2] = {cmd,value};
+	uint8_t attemptI2Cwrite = _I2C_ErrorRetryNum;
+	uint8_t ReasonCodes = 0;
 	
-	returnCode = bcm2835_i2c_write(buf, 2); 
-	while(returnCode != 0)
-	{ // failure to write I2C byte 
-		attemptI2Cwrite ++;
+	ReasonCodes = bcm2835_i2c_write(ByteBuffer, 2); 
+	while(ReasonCodes != 0)
+	{//failure to write I2C byte ,Error handling retransmit
+		
 		if (_I2C_DebugFlag == true)
 		{
-			printf("Error I2C_Write_Byte : Cannot Write byte attempt no :: %u\n", attemptI2Cwrite);
-			printf("bcm2835I2CReasonCodes :: Error code :: %u\n", returnCode);
+			printf("Error I2C_Write_Byte : Cannot Write byte attempt no :: %u\n", +attemptI2Cwrite);
+			printf("bcm2835I2CReasonCodes :: Error code :: %u\n", +ReasonCodes);
 		}
-		returnCode  = bcm2835_i2c_write(buf, 2);
-		bcm2835_delay(100); // mS
-		if (attemptI2Cwrite >= 3) break;
+		bcm2835_delay(_I2C_ErrorDelay); // delay mS
+		ReasonCodes  = bcm2835_i2c_write(ByteBuffer, 2); //retry
+		_I2C_ErrorFlag = ReasonCodes; // set reasonCode to flag
+		attemptI2Cwrite--; // Decrement retry attempt
+		if (attemptI2Cwrite == 0) break;
 	}
+	_I2C_ErrorFlag = ReasonCodes;
 }
 
 /*!
@@ -298,7 +370,8 @@ void SSD1306::I2C_Write_Byte(uint8_t value, uint8_t cmd)
 void SSD1306::OLEDupdate()
 {
 	uint8_t x = 0; uint8_t y = 0; uint8_t w = this->bufferWidth; uint8_t h = this->bufferHeight;
-	OLEDBuffer( x,  y,  w,  h, (uint8_t*) this->buffer);
+	//OLEDBufferScreen( x,  y,  w,  h, (uint8_t*) this->OLEDbuffer); TODO
+	OLEDBufferScreen( x,  y,  w,  h, this->OLEDbuffer);
 }
 
 /*!
@@ -306,7 +379,7 @@ void SSD1306::OLEDupdate()
 */
 void SSD1306::OLEDclearBuffer()
 {
-	memset( this->buffer, 0x00, (this->bufferWidth * (this->bufferHeight /8))  );
+	memset( this->OLEDbuffer, 0x00, (this->bufferWidth * (this->bufferHeight /8)));
 }
 
 /*!
@@ -318,7 +391,7 @@ void SSD1306::OLEDclearBuffer()
 	@param data the buffer data
 	@note Called by OLEDupdate internally 
 */
-void SSD1306::OLEDBuffer(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t* data)
+void SSD1306::OLEDBufferScreen(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t* data)
 {
 	OLED_I2C_Settings();
 	uint8_t tx, ty;
@@ -365,7 +438,8 @@ void SSD1306::drawPixel(int16_t x, int16_t y, uint8_t color)
 	return;
 	}
 	int16_t temp;
-	switch (_rotation) {
+	uint8_t rotation = getRotation();
+	switch (rotation) {
 	case 1:
 		temp = x;
 		x = WIDTH - 1 - y;
@@ -384,9 +458,9 @@ void SSD1306::drawPixel(int16_t x, int16_t y, uint8_t color)
 		uint16_t tc = (bufferWidth * (y /8)) + x;
 		switch (color)
 		{
-			case WHITE:  this->buffer[tc] |= (1 << (y & 7)); break;
-			case BLACK:  this->buffer[tc] &= ~(1 << (y & 7)); break;
-			case INVERSE: this->buffer[tc] ^= (1 << (y & 7)); break;
+			case WHITE:  this->OLEDbuffer[tc] |= (1 << (y & 7)); break;
+			case BLACK:  this->OLEDbuffer[tc] &= ~(1 << (y & 7)); break;
+			case INVERSE: this->OLEDbuffer[tc] ^= (1 << (y & 7)); break;
 		}
 }
 
@@ -481,5 +555,82 @@ void SSD1306::OLEDStopScroll(void)
 */
 uint16_t SSD1306::getLibVerNum(void){return _LibraryVersionNum;}
 
+
+/*!
+	 @brief Turn DEBUG mode on or off setter
+	 @param OnOff passed bool True = debug on , false = debug off
+	 @note prints out statements, if ON and if errors occur
+*/
+void SSD1306::OLEDDebugSet(bool OnOff)
+{
+	 OnOff ? (_I2C_DebugFlag  = true) : (_I2C_DebugFlag = false);
+}
+
+/*!
+	 @brief get DEBUG mode status
+	 @return debug mode status flag
+*/
+bool SSD1306::OLEDDebugGet(void) { return _I2C_DebugFlag;}
+
+
+/*!
+	@brief get I2C error Flag
+	@details bcm2835I2Creasoncode.
+		-# BCM2835_I2C_REASON_OK   	     = 0x00,Success 
+		-# BCM2835_I2C_REASON_ERROR_NACK    = 0x01,Received a NACK 
+		-# BCM2835_I2C_REASON_ERROR_CLKT    = 0x02,Received Clock Stretch Timeout 
+		-# BCM2835_I2C_REASON_ERROR_DATA    = 0x04, Not all data is sent / receive
+		-# BCM2835_I2C_REASON_ERROR_TIMEOUT = 0x08 Time out occurred during sending 
+	 @return I2C error flag = 0x00 no error , > 0 bcm2835I2Creasoncode.
+*/
+uint8_t SSD1306::OLEDI2CErrorGet(void) { return _I2C_ErrorFlag;}
+
+/*!
+	 @brief Sets the I2C timeout, in the event of an I2C write error
+	@param newTimeOut I2C timeout delay in mS
+	@details Delay between retry attempts in event of an error , mS
+*/
+void SSD1306::OLEDI2CErrorTimeoutSet(uint16_t newTimeout)
+{
+	_I2C_ErrorDelay = newTimeout;
+}
+
+/*!
+	 @brief Gets the I2C timeout, used in the event of an I2C write error
+	 @details Delay between retry attempts in event of an error , mS
+	 @return  I2C timeout delay in mS, _I2C_ErrorDelay
+*/
+uint16_t SSD1306::OLEDI2CErrorTimeoutGet(void){return _I2C_ErrorDelay;}
+
+/*!
+	 @brief Gets the I2C error retry attempts, used in the event of an I2C write error
+	 @details Number of times to retry in event of an error
+	 @return   _I2C_ErrorRetryNum
+*/
+uint8_t SSD1306::OLEDI2CErrorRetryNumGet(void){return _I2C_ErrorRetryNum;}
+
+/*!
+	 @brief Sets the I2C error retry attempts used in the event of an I2C write error
+	 @details Number of times to retry in event of an error
+	 @param AttemptCount I2C retry attempts 
+*/
+void SSD1306::OLEDI2CErrorRetryNumSet(uint8_t AttemptCount)
+{
+	_I2C_ErrorRetryNum = AttemptCount;
+}
+
+/*! 
+	@brief checks if OLED on I2C bus
+	@return bcm2835I2CReasonCodes , BCM2835_I2C_REASON_OK 0x00 = Success
+*/ 
+uint8_t SSD1306::OLEDCheckConnection(void)
+{
+	char rxdata[1]; //buffer to hold return byte
+	
+	bcm2835_i2c_setSlaveAddress(_I2C_address);  // set i2c address
+	_I2C_ErrorFlag = bcm2835_i2c_read(rxdata, 1); // returns reason code , 0 success
+
+	return _I2C_ErrorFlag;
+}
 
 // ---  EOF ---

@@ -22,3 +22,7 @@
 	* Refactored I2C bus control to give user more control and visibility.
 	* Changed CCFLAGS in root directory Makefile to allow for Compilation on 64-bit systems. See Pull request number 2 on github
 	* Fixed bug in "println" method for String objects.
+* version 1.6 Feb 2024
+	* Added Fonts 11 and 12
+	* Added Error enum OLED_return_codes_e to text and bitmap methods.
+	* Added User ability to change I2C error delay and retry attempts. 

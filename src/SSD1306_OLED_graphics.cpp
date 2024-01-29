@@ -19,10 +19,9 @@ SSD1306_graphics::SSD1306_graphics(int16_t w, int16_t h):
 	_height    = HEIGHT;
 	_cursor_y  = 0;
 	_cursor_x  = 0;
-	_rotation  = 0;
-	_textsize  = 1;
-	_textcolor = 0x00;
-	_textbgcolor = 0xFF;
+	_textSize  = 1;
+	_textColor = 0x00;
+	_textBgColor = 0xFF;
 	_textwrap  = true;
 }
 
@@ -405,26 +404,32 @@ void SSD1306_graphics::fillTriangle ( int16_t x0, int16_t y0,
 */
 size_t SSD1306_graphics::write(uint8_t character) 
 {
-	if (_FontNumber < OLEDFontType_Bignum)
+	int DrawCharReturnCode;
+	if (_FontNumber < OLEDFont_Bignum)
 	{
 		switch (character)
 		{
 		case '\n':
-			_cursor_y += _textsize*_CurrentFontheight;
+			_cursor_y += _textSize*_CurrentFontheight;
 			_cursor_x  = 0;
 		break;
 		case'\r':/* skip */ break;
 		default:
-			drawChar(_cursor_x, _cursor_y, character, _textcolor, _textbgcolor, _textsize);
-			_cursor_x += _textsize*(_CurrentFontWidth+1);
-				if (_textwrap && (_cursor_x > (_width - _textsize*(_CurrentFontWidth+1)))) 
-				{
-				  _cursor_y += _textsize*_CurrentFontheight;
-				  _cursor_x = 0;
-				}
+			DrawCharReturnCode = drawChar(_cursor_x, _cursor_y, character, _textColor, _textBgColor, _textSize) ;
+			if(DrawCharReturnCode  != OLED_Success)
+			{
+				printf( "Error write_print method 1: Method drawChar failed:  %i\n",DrawCharReturnCode);
+				return DrawCharReturnCode;
+			}
+			_cursor_x += _textSize*(_CurrentFontWidth+1);
+			if (_textwrap && (_cursor_x > (_width - _textSize*(_CurrentFontWidth+1)))) 
+			{
+				_cursor_y += _textSize*_CurrentFontheight;
+				_cursor_x = 0;
+			}
 		break;
 		}
-	}else // for font numbers 7-10
+	}else // for font numbers 7-12
 	{
 		switch (character)
 		{
@@ -434,7 +439,12 @@ size_t SSD1306_graphics::write(uint8_t character)
 			break;
 			case '\r': /* skip */  break;
 			default:
-				drawCharBigFont(_cursor_x, _cursor_y, character, _textcolor, _textbgcolor);
+				DrawCharReturnCode = drawChar(_cursor_x, _cursor_y, character, _textColor, _textBgColor) ;
+				if(DrawCharReturnCode  != OLED_Success)
+				{
+					printf( "Error write_print method 2 : Method drawChar failed: %i\n",DrawCharReturnCode);
+					return DrawCharReturnCode;
+				}
 				_cursor_x += (_CurrentFontWidth);
 				if (_textwrap && (_cursor_x  > (_width - (_CurrentFontWidth+1)))) 
 				{
@@ -448,23 +458,40 @@ size_t SSD1306_graphics::write(uint8_t character)
 }
 
 /*!
-	@brief  writes a char (c) on the OLED
+	@brief  writes a character on the OLED
 	@param  x X coordinate
 	@param  y Y coordinate
-	@param  c The ASCII character
+	@param  character The ASCII character
 	@param color  color
 	@param bg background color
 	@param size 1-x
+	@return OLED_Return_Codes_e enum
 	@note for font #1-6 only
 */
-void SSD1306_graphics::drawChar(int16_t x, int16_t y, unsigned char c,
+OLED_Return_Codes_e SSD1306_graphics::drawChar(int16_t x, int16_t y, unsigned char character,
 				uint8_t color, uint8_t bg, uint8_t size) {
 
+	// 1. Check for wrong font
+	if (_FontNumber >= OLEDFont_Bignum)
+	{
+		printf("Error drawChar 1: Wrong font selected, must be font 1-6: %u \r\n",OLED_WrongFont);
+		return OLED_WrongFont;
+	}
+	// 2. Check for screen out of  bounds
 	if((x >= _width)            || // Clip right
-	 (y >= _height)           || // Clip bottom
-	 ((x + (_CurrentFontWidth+1) * size - 1) < 0) || // Clip left
-	 ((y + _CurrentFontheight * size - 1) < 0))   // Clip top
-	return;
+	(y >= _height)           || // Clip bottom
+	((x + (_CurrentFontWidth+1) * size - 1) < 0) || // Clip left
+	((y + _CurrentFontheight  * size - 1) < 0))   // Clip top
+	{
+		printf("Error drawChar 2: Co-ordinates out of bounds : %u \r\n",OLED_CharScreenBounds );
+		return OLED_CharScreenBounds;
+	}
+	// 3. Check for character out of font range bounds
+	if ( character < _CurrentFontoffset || character >= (_CurrentFontLength+ _CurrentFontoffset))
+	{
+		printf("Error drawChar 3: Character out of Font bounds: %u:  %u  %u<->%u \r\n", OLED_CharFontASCIIRange, character,_CurrentFontoffset, (_CurrentFontLength + _CurrentFontoffset));
+		return OLED_CharFontASCIIRange;
+	}
 
 	for (int8_t i=0; i<(_CurrentFontWidth+1); i++ ) {
 	uint8_t line;
@@ -476,15 +503,15 @@ void SSD1306_graphics::drawChar(int16_t x, int16_t y, unsigned char c,
 	{
 		switch (_FontNumber) 
 		{
-			case OLEDFontType_Default : line = pFontDefaultptr[((c - _CurrentFontoffset) * _CurrentFontWidth) + i]; break;
-			case OLEDFontType_Thick : line = pFontThickptr[((c - _CurrentFontoffset) * _CurrentFontWidth) + i]; break;
-			case OLEDFontType_SevenSeg: line = pFontSevenSegptr[((c - _CurrentFontoffset) * _CurrentFontWidth) + i]; break;
-			case OLEDFontType_Wide : line = pFontWideptr[((c - _CurrentFontoffset) * _CurrentFontWidth) + i]; break;
-			case OLEDFontType_Tiny : line = pFontTinyptr[((c - _CurrentFontoffset) * _CurrentFontWidth) + i]; break;
-			case OLEDFontType_Homespun : line = pFontHomeSpunptr[((c - _CurrentFontoffset) * _CurrentFontWidth) + i]; break;
+			case OLEDFont_Default : line = pFontDefaultptr[((character - _CurrentFontoffset) * _CurrentFontWidth) + i]; break;
+			case OLEDFont_Thick : line = pFontThickptr[((character - _CurrentFontoffset) * _CurrentFontWidth) + i]; break;
+			case OLEDFont_SevenSeg: line = pFontSevenSegptr[((character - _CurrentFontoffset) * _CurrentFontWidth) + i]; break;
+			case OLEDFont_Wide : line = pFontWideptr[((character - _CurrentFontoffset) * _CurrentFontWidth) + i]; break;
+			case OLEDFont_Tiny : line = pFontTinyptr[((character - _CurrentFontoffset) * _CurrentFontWidth) + i]; break;
+			case OLEDFont_Homespun : line = pFontHomeSpunptr[((character - _CurrentFontoffset) * _CurrentFontWidth) + i]; break;
 		default:
-			printf("Error: Wrong font number ,must be 1-6\n");
-			return;
+			printf("Error drawChar 1: Wrong font selected, must be font 1-6 : %u\r\n", OLED_WrongFont);
+			return OLED_WrongFont;
 		break;
 		} //switch font linenumber
 	}
@@ -508,6 +535,7 @@ void SSD1306_graphics::drawChar(int16_t x, int16_t y, unsigned char c,
 		line >>= 1;
 	}
 	}
+	return OLED_Success;
 }
 
 /*! 
@@ -524,17 +552,13 @@ void SSD1306_graphics::setCursor(int16_t x, int16_t y) {
 	@brief set the text size , starts at 1 
 	@param s Size of text 1-X 
 */
-void SSD1306_graphics::setTextSize(uint8_t s) {
-	_textsize = (s > 0) ? s : 1;
-}
+void SSD1306_graphics::setTextSize(uint8_t s) {_textSize = (s > 0) ? s : 1;}
 
 /*! 
 	@brief set the text color  
 	@param c Color of text 
 */
-void SSD1306_graphics::setTextColor(uint8_t c) {
-	_textcolor = _textbgcolor = c;
-}
+void SSD1306_graphics::setTextColor(uint8_t c) {_textColor = _textBgColor = c;}
 
 /*! 
 	@brief set the text color  
@@ -542,160 +566,213 @@ void SSD1306_graphics::setTextColor(uint8_t c) {
 	@param b color of background of text 
 */
 void SSD1306_graphics::setTextColor(uint8_t c, uint8_t b) {
-	_textcolor   = c;
-	_textbgcolor = b; 
+	_textColor   = c;
+	_textBgColor = b; 
 }
 
 /*!
 	@brief turn on or off screen _textwrap of the text (fonts 1-6)
 	@param w TRUE on
 */
-void SSD1306_graphics::setTextWrap(bool w) {
-	_textwrap = w;
-}
+void SSD1306_graphics::setTextWrap(bool w) {_textwrap = w;}
 
 /*!
 	@brief Gets the width of the display (per current _rotation)
 	@return width member of display in pixels 
 */
-int16_t SSD1306_graphics::width(void) const {
-	return _width;
-}
+int16_t SSD1306_graphics::width(void) const {return _width;}
  
 /*!
 	@brief Gets the height of the display (per current _rotation)
 	@return height member of display in pixels 
 */
-int16_t SSD1306_graphics::height(void) const {
-	return _height;
-}
+int16_t SSD1306_graphics::height(void) const {return _height;}
 
  /*!
 	@brief Gets the _rotation of the display 
 	@return _rotation value 0-3
 */
-uint8_t SSD1306_graphics::getRotation(void) const {
-	return _rotation;
-}
+OLED_rotate_e SSD1306_graphics::getRotation(void){return _OLED_rotate;}
 
  /*!
 	@brief Sets the _rotation of the display 
-	@param x _rotation value 0-3
+	@param CurrentRotation value 0-3
 */
-void SSD1306_graphics::setRotation(uint8_t x) {
-	_rotation = (x & 3);
-	switch(_rotation) {
-	 case 0:
-	 case 2:
-		_width  = WIDTH;
-		_height = HEIGHT;
-		break;
-	 case 1:
-	 case 3:
-		_width  = HEIGHT;
-		_height = WIDTH;
-		break;
+void SSD1306_graphics::setRotation(OLED_rotate_e CurrentRotation) {
+
+	_OLED_rotate = CurrentRotation;
+	switch(CurrentRotation) 
+	{
+		case 0:
+		case 2:
+			_width  = WIDTH;
+			_height = HEIGHT;
+			break;
+		case 1:
+		case 3:
+			_width  = HEIGHT;
+			_height = WIDTH;
+			break;
 	}
 }
 
 
 /*!
 	@brief   Set the current font type
-	@param FontNumber 1-10 enum OLEDFontType_e
+	@param FontNumber enum OLEDFontType_e
 */
 void SSD1306_graphics::setFontNum(OLEDFontType_e FontNumber) 
 {
 	_FontNumber = FontNumber;
 
 	switch (_FontNumber) {
-	case OLEDFontType_Default:  // Norm default 5 by 8
-		_CurrentFontWidth = OLEDFontWidth_5;
-		_CurrentFontoffset =  OLEDFontOffset_Extend;
-		_CurrentFontheight = OLEDFontHeight_8;
-	break; 
-	case OLEDFontType_Thick: // Thick 7 by 8 (NO LOWERCASE LETTERS)
-		_CurrentFontWidth = OLEDFontWidth_7;
-		_CurrentFontoffset = OLEDFontOffset_Space;
-		_CurrentFontheight = OLEDFontHeight_8;
-	break; 
-	case OLEDFontType_SevenSeg:  // Seven segment 4 by 8
-		_CurrentFontWidth = OLEDFontWidth_4;
-		_CurrentFontoffset = OLEDFontOffset_Space;
-		_CurrentFontheight = OLEDFontHeight_8;
-	break;
-	case OLEDFontType_Wide : // Wide  8 by 8 (NO LOWERCASE LETTERS)
-		_CurrentFontWidth = OLEDFontWidth_8;
-		_CurrentFontoffset = OLEDFontOffset_Space;
-		_CurrentFontheight = OLEDFontHeight_8;
-	break; 
-	case OLEDFontType_Tiny:  // tiny 3 by 8
-		_CurrentFontWidth = OLEDFontWidth_3;
-		_CurrentFontoffset =  OLEDFontOffset_Space;
-		_CurrentFontheight = OLEDFontHeight_8;
-	break;
-	case OLEDFontType_Homespun: // homespun 7 by 8 
-		_CurrentFontWidth = OLEDFontWidth_7;
-		_CurrentFontoffset = OLEDFontOffset_Space;
-		_CurrentFontheight = OLEDFontHeight_8;
-	break;
-	case OLEDFontType_Bignum : // big nums 16 by 32 (NUMBERS + : only)
-		_CurrentFontWidth = OLEDFontWidth_16;
-		_CurrentFontoffset = OLEDFontOffset_Minus;
-		_CurrentFontheight = OLEDFontHeight_32;
-	break; 
-	case OLEDFontType_Mednum: // med nums 16 by 16 (NUMBERS + : only)
-		_CurrentFontWidth = OLEDFontWidth_16;
-		_CurrentFontoffset =  OLEDFontOffset_Minus;
-		_CurrentFontheight = OLEDFontHeight_16;
-	break;
-	case OLEDFontType_ArialRound: // Arial round 16 by 24 
-		_CurrentFontWidth = OLEDFontWidth_16;
-		_CurrentFontoffset = OLEDFontOffset_Space;
-		_CurrentFontheight = OLEDFontHeight_24;
-	break;
-	case OLEDFontType_ArialBold: // Arial bold  16 by 16
-		_CurrentFontWidth = OLEDFontWidth_16;
-		_CurrentFontoffset = OLEDFontOffset_Space;
-		_CurrentFontheight = OLEDFontHeight_16;
-	break;
-	default: // if wrong font num passed in,  set to default
-		_CurrentFontWidth = OLEDFontWidth_5;
-		_CurrentFontoffset =  OLEDFontOffset_Extend;
-		_CurrentFontheight = OLEDFontHeight_8;
-		_FontNumber = OLEDFontType_Default;
-	break;
-    }
+		case OLEDFont_Default:  // Norm default 5 by 8
+			_CurrentFontWidth = OLEDFontWidth_5;
+			_CurrentFontoffset =  OLEDFontOffset_Extend;
+			_CurrentFontheight = OLEDFontHeight_8;
+			_CurrentFontLength = OLEDFontLenAll;
+		break;
+		case OLEDFont_Thick: // Thick 7 by 8 (NO LOWERCASE LETTERS)
+			_CurrentFontWidth = OLEDFontWidth_7;
+			_CurrentFontoffset = OLEDFontOffset_Space;
+			_CurrentFontheight = OLEDFontHeight_8;
+			_CurrentFontLength = OLEDFontLenAlphaNumNoLCase;
+		break;
+		case OLEDFont_SevenSeg:  // Seven segment 4 by 8
+			_CurrentFontWidth = OLEDFontWidth_4;
+			_CurrentFontoffset = OLEDFontOffset_Space;
+			_CurrentFontheight = OLEDFontHeight_8;
+			_CurrentFontLength = OLEDFontLenAlphaNum;
+		break;
+		case OLEDFont_Wide : // Wide  8 by 8 (NO LOWERCASE LETTERS)
+			_CurrentFontWidth = OLEDFontWidth_8;
+			_CurrentFontoffset = OLEDFontOffset_Space;
+			_CurrentFontheight = OLEDFontHeight_8;
+			_CurrentFontLength = OLEDFontLenAlphaNumNoLCase;
+		break;
+		case OLEDFont_Tiny:  // tiny 3 by 8
+			_CurrentFontWidth = OLEDFontWidth_3;
+			_CurrentFontoffset =  OLEDFontOffset_Space;
+			_CurrentFontheight = OLEDFontHeight_8;
+			_CurrentFontLength = OLEDFontLenAlphaNum;
+		break;
+		case OLEDFont_Homespun: // homespun 7 by 8
+			_CurrentFontWidth = OLEDFontWidth_7;
+			_CurrentFontoffset = OLEDFontOffset_Space;
+			_CurrentFontheight = OLEDFontHeight_8;
+			_CurrentFontLength = OLEDFontLenAlphaNum;
+		break;
+		case OLEDFont_Bignum : // big nums 16 by 32 (NUMBERS)
+			_CurrentFontWidth = OLEDFontWidth_16;
+			_CurrentFontoffset = OLEDFontOffset_Minus;
+			_CurrentFontheight = OLEDFontHeight_32;
+			_CurrentFontLength = OLEDFontLenNumeric;
+		break;
+		case OLEDFont_Mednum: // med nums 16 by 16 (NUMBERS)
+			_CurrentFontWidth = OLEDFontWidth_16;
+			_CurrentFontoffset =  OLEDFontOffset_Minus;
+			_CurrentFontheight = OLEDFontHeight_16;
+			_CurrentFontLength = OLEDFontLenNumeric;
+		break;
+		case OLEDFont_ArialRound: // Arial round 16 by 24
+			_CurrentFontWidth = OLEDFontWidth_16;
+			_CurrentFontoffset = OLEDFontOffset_Space;
+			_CurrentFontheight = OLEDFontHeight_24;
+			_CurrentFontLength = OLEDFontLenAlphaNum;
+		break;
+		case OLEDFont_ArialBold: // Arial bold  16 by 16
+			_CurrentFontWidth = OLEDFontWidth_16;
+			_CurrentFontoffset = OLEDFontOffset_Space;
+			_CurrentFontheight = OLEDFontHeight_16;
+			_CurrentFontLength = OLEDFontLenAlphaNum;
+		break;
+		case OLEDFont_Mia: // mia  8 by 16
+			_CurrentFontWidth = OLEDFontWidth_8;
+			_CurrentFontoffset = OLEDFontOffset_Space;
+			_CurrentFontheight = OLEDFontHeight_16;
+			_CurrentFontLength = OLEDFontLenAlphaNum;
+		break;
+		case OLEDFont_Dedica: // dedica  6 by 12
+			_CurrentFontWidth = OLEDFontWidth_6;
+			_CurrentFontoffset = OLEDFontOffset_Space;
+			_CurrentFontheight = OLEDFontHeight_12;
+			_CurrentFontLength = OLEDFontLenAlphaNum;
+		break;
+		default: // if wrong font num passed in,  set to default
+			_CurrentFontWidth = OLEDFontWidth_5;
+			_CurrentFontoffset =  OLEDFontOffset_Extend;
+			_CurrentFontheight = OLEDFontHeight_8;
+			_CurrentFontLength = OLEDFontLenAlphaNum;
+			_FontNumber = OLEDFont_Default;
+		break;
+	}
 }
 
 /*!
-	@brief writes a char (c) on the OLED
+	@brief writes a character on the OLED
 	@param x X coordinate
 	@param y Y coordinate
-	@param c The ASCII character
+	@param character The ASCII character
 	@param color 
 	@param bg background color
-	@note for font 7-10 only
+	@return OLED_Return_Codes_e
+	@note for font 7-12 only
 */
-void SSD1306_graphics::drawCharBigFont(uint8_t x, uint8_t y, uint8_t c, uint8_t color , uint8_t bg) 
+OLED_Return_Codes_e SSD1306_graphics::drawChar(uint8_t x, uint8_t y, uint8_t character, uint8_t color , uint8_t bg) 
 {
-	if (_FontNumber < OLEDFontType_Bignum)
+	uint8_t FontSizeMod = 0;
+	// Check user input
+	// 1. Check for wrong font
+	switch (_FontNumber)
 	{
-		printf("Error: Wrong font selected, must be 7 - 10 \n");
-		return;
+		case OLEDFont_Bignum:
+		case OLEDFont_Mednum:
+		case OLEDFont_ArialRound:
+		case OLEDFont_ArialBold:
+			FontSizeMod  = 2;
+		break;
+		case OLEDFont_Mia:
+		case OLEDFont_Dedica:
+			FontSizeMod  = 1;
+		break;
+		default:
+			printf("Error drawChar 4: Wrong font selected, must be font 7-12: %u \r\n",  OLED_WrongFont);
+			return OLED_WrongFont;
+		break;
+	}
+	// 2. Check for character out of font bounds
+	if ( character < _CurrentFontoffset || character >= (_CurrentFontLength+ _CurrentFontoffset))
+	{
+		printf("Error drawChar 3: Character out of Font bounds : %u :  %u  %u<->%u \r\n",OLED_CharFontASCIIRange, character,_CurrentFontoffset, (_CurrentFontLength + _CurrentFontoffset));
+		return OLED_CharFontASCIIRange;
+	}
+	// 3. Check for screen out of  bounds
+	if((x >= _width)            || // Clip right
+	(y >= _height)           || // Clip bottom
+	((x + _CurrentFontWidth+1) < 0) || // Clip left
+	((y + _CurrentFontheight) < 0))   // Clip top
+	{
+		printf( "Error drawChar 3: Co-ordinates out of bounds: %u  \r\n", OLED_CharScreenBounds);
+		return OLED_CharScreenBounds;
 	}
 	
 	uint8_t i, j;
 	uint8_t ctemp = 0, y0 = y; 
 
-	for (i = 0; i < _CurrentFontheight*2; i++) 
+	for (i = 0; i < _CurrentFontheight*FontSizeMod; i++) 
 	{
 		switch (_FontNumber)
 		{
-			case OLEDFontType_Bignum: ctemp = pFontBigNumptr[c - _CurrentFontoffset][i]; break; 
-			case OLEDFontType_Mednum: ctemp = pFontMedNumptr[c - _CurrentFontoffset][i]; break;
-			case OLEDFontType_ArialRound: ctemp = pFontArial16x24ptr[c - _CurrentFontoffset][i]; break;
-			case OLEDFontType_ArialBold: ctemp = pFontArial16x16ptr[c - _CurrentFontoffset][i]; break;
-			default : return; break;
+			case OLEDFont_Bignum: ctemp = pFontBigNumptr[character - _CurrentFontoffset][i]; break;
+			case OLEDFont_Mednum: ctemp = pFontMedNumptr[character - _CurrentFontoffset][i]; break;
+			case OLEDFont_ArialRound: ctemp = pFontArial16x24ptr[character - _CurrentFontoffset][i]; break;
+			case OLEDFont_ArialBold: ctemp = pFontArial16x16ptr[character - _CurrentFontoffset][i]; break;
+			case OLEDFont_Mia: ctemp = pFontMia8x16ptr[character - _CurrentFontoffset][i]; break;
+			case OLEDFont_Dedica: ctemp = pFontDedica8x12ptr[character - _CurrentFontoffset][i]; break;
+			default :
+				printf("Error drawChar 4: Wrong font selected, must be font 7-12 : %u\r\n",  OLED_WrongFont);
+				return OLED_WrongFont;
+			break;
 		}
 		
 		for (j = 0; j < 8; j++) 
@@ -718,6 +795,7 @@ void SSD1306_graphics::drawCharBigFont(uint8_t x, uint8_t y, uint8_t c, uint8_t 
 			}
 		}
 	}
+	return OLED_Success;
 }
 
 /*!
@@ -727,16 +805,27 @@ void SSD1306_graphics::drawCharBigFont(uint8_t x, uint8_t y, uint8_t c, uint8_t 
 	@param pText pointer to string of ASCII character's
 	@param color text color
 	@param bg background color
-	@note for font 7-10 only
+	@return OLED_Return_Codes_e enum
+	@note for font 7-12 only
 */
-void SSD1306_graphics::drawTextBigFont(uint8_t x, uint8_t y, 
+OLED_Return_Codes_e SSD1306_graphics::drawText(uint8_t x, uint8_t y, 
 						char *pText, uint8_t color, uint8_t bg) 
 {
-	if (_FontNumber < OLEDFontType_Bignum)
+	OLED_Return_Codes_e DrawCharReturnCode;
+	// Check correct font number
+	if (_FontNumber < OLEDFont_Bignum)
 	{
-		printf("Error: Wrong font selected, must be 7 -10 \n");
-		return;
+		printf("Error drawText 1 :Wrong font selected, must be 7 -12: %u \n",  OLED_WrongFont);
+		return OLED_WrongFont;
 	}
+
+	// Check for null pointer
+	if(pText == nullptr)
+	{
+		printf("Error drawText 2 :String array is not valid pointer: %u \n", OLED_CharArrayNullptr);
+		return OLED_CharArrayNullptr;
+	}
+
 	while (*pText != '\0') 
 	{
 		if (x > (_width - _CurrentFontWidth )) 
@@ -748,10 +837,16 @@ void SSD1306_graphics::drawTextBigFont(uint8_t x, uint8_t y,
 				y = x = 0;
 			}
 		}
-		drawCharBigFont(x, y, *pText, color, bg);
+		DrawCharReturnCode = drawChar(x, y, *pText, color, bg);
+		if(DrawCharReturnCode  != OLED_Success)
+		{
+			printf("Error drawText 3: Method drawChar failed: %u\n", DrawCharReturnCode);
+			return DrawCharReturnCode;
+		}
 		x += _CurrentFontWidth ;
 		pText++;
 	}
+	return OLED_Success;
 }
 
 
@@ -763,28 +858,44 @@ void SSD1306_graphics::drawTextBigFont(uint8_t x, uint8_t y,
 	@param color text color
 	@param bg background color
 	@param size 1-x
+	@return OLED_Return_Codes_e enum
 	@note for font #1-6 only
 */
-void SSD1306_graphics::drawText(uint8_t x, uint8_t y, char *pText, uint8_t color, uint8_t bg, uint8_t size) 
+OLED_Return_Codes_e SSD1306_graphics::drawText(uint8_t x, uint8_t y, char *pText, uint8_t color, uint8_t bg, uint8_t size) 
 {
-	if (_FontNumber >= OLEDFontType_Bignum)
+	// check Correct font number
+	if (_FontNumber >= OLEDFont_Bignum)
 	{
-		printf("Error: Wrong font selected, must be 1-6 \n");
-		return;
+		printf("Error drawText 1: Wrong font number , must be 1-6 %u\n", OLED_WrongFont);
+		return OLED_WrongFont;
 	}
-	uint8_t _cursor_x, _cursor_y;
-	_cursor_x = x, _cursor_y = y;
-	  while (*pText != '\0') 
-	  {
-		if (_textwrap && ((_cursor_x + size * _CurrentFontWidth) > _width)) 
+	// Check for null pointer
+	if(pText == nullptr)
+	{
+		printf("Error drawText 2: String array is not valid pointer: %u \n", OLED_CharArrayNullptr);
+		return OLED_CharArrayNullptr;
+	}
+	OLED_Return_Codes_e DrawCharReturnCode;
+	uint8_t lcursor_x = x; 
+	uint8_t lcursor_y = y;
+
+	while (*pText != '\0') 
+	{
+		if (_textwrap && ((lcursor_x + size * _CurrentFontWidth) > _width)) 
 		{
-			_cursor_x = 0;
-			_cursor_y = _cursor_y + size * 7 + 3;
-			if (_cursor_y > _height) _cursor_y = _height;
+			lcursor_x = 0;
+			lcursor_y = lcursor_y + size * 7 + 3;
+			if (lcursor_y > _height) lcursor_y = _height;
 		}
-		drawChar(_cursor_x, _cursor_y, *pText, color, bg, size);
-		_cursor_x = _cursor_x + size * (_CurrentFontWidth + 1);
-		if (_cursor_x > _width) _cursor_x = _width;
+		DrawCharReturnCode = drawChar(lcursor_x, lcursor_y, *pText, color, bg, size);
+		if (DrawCharReturnCode != OLED_Success)
+		{
+			printf("Error drawText 3: Method drawChar failed: %u\n", DrawCharReturnCode);
+			return DrawCharReturnCode;
+		};
+		lcursor_x = lcursor_x + size * (_CurrentFontWidth + 1);
+		if (lcursor_x > _width) lcursor_x = _width;
 		pText++;
-	  }
+	}
+	return OLED_Success;
 }

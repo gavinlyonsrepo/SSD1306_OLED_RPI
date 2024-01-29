@@ -27,7 +27,7 @@ SRCS = $(wildcard $(SRC)/*.cpp)
 OBJS = $(patsubst $(SRC)%.cpp,  $(OBJ)/%.o, $(SRCS))
 
 CXX=g++
-CCFLAGS= -Ofast -march=native -mtune=native -mcpu=native -Iinclude/
+CCFLAGS=  -march=native -mtune=native -mcpu=native -Iinclude/
 LDFLAGS= -lbcm2835
 
 # make all
@@ -47,7 +47,7 @@ SSD1306_OLED_RPI: $(OBJS)
 
 # Library parts
 $(OBJ)/%.o: $(SRC)/%.cpp
-	$(CXX) -Wall -fPIC -c $(CCFLAGS) $< -o $@
+	$(CXX) -Wall -Wextra -Wshadow -fPIC -c $(CCFLAGS) $< -o $@
 
 # Install the library to LIBPATH
 install:
