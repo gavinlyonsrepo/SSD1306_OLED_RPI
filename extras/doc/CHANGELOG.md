@@ -2,10 +2,6 @@
 
 * version 1.0.0 May 2021
 	* first release.
-* Version 1.1 June 2021
-	* packaged library files as a dynamic C++ install-able system level library complete with makefile.
-* version 1.2 July 2021
-	* Added Large Numerical fonts (7&8) and changed print class functionality so print class works with them.
 * version 1.3 Jan 2023
 	* Added Fonts, tiny and homespun.
 	* Added "Drawtext" method
@@ -22,7 +18,10 @@
 	* Refactored I2C bus control to give user more control and visibility.
 	* Changed CCFLAGS in root directory Makefile to allow for Compilation on 64-bit systems. See Pull request number 2 on github
 	* Fixed bug in "println" method for String objects.
-* version 1.6 Feb 2024
+* version 1.6 Jan 2024
 	* Added Fonts 11 and 12
 	* Added Error enum OLED_return_codes_e to text and bitmap methods.
 	* Added User ability to change I2C error delay and retry attempts. 
+* version 1.6.1 Feb 2024
+	* minor update, modified the screen boundary check in 'drawPixel' method 
+	so 90 and 270 degree screen rotation works fully for entire rotated screen area.
