@@ -157,12 +157,12 @@ Font data table:
 
 Font Methods: 
 
-| Font num | -Size parameter |Method | Notes |
+| Font num | Method name| Size parameter | Notes |
 | ------ | ------ | ------ | ------ |
-| 1-6 | drawChar| Y |draws single  character |
-| 1-6 | drawText | Y|draws character array |
-| 7-12 | drawChar| N|draws single  character |
-| 7-12 | drawText | N|draws character array |
+| 1-6 | drawChar| Yes |draws single  character |
+| 1-6 | drawText | Yes|draws character array |
+| 7-12 | drawChar| No|draws single  character |
+| 7-12 | drawText | No|draws character array |
 | All | print | ~|Polymorphic print class which will print out most data types |
 
 These methods return a enum( OLED_Return_Codes_e), non-zero in event of an error, see API doc., such as wrong font chosen , ASCII character outside
