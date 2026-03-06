@@ -177,7 +177,7 @@ Two different bitmaps methods can be used.
 | 1 | OLEDBitmap() |horizontal| Draws bitmaps to the buffer | 
 | 2 | OLEDBuffer() |vertical | Write a full screen bitmap direct to screen, used internally| 
 
-Bitmaps can be turned to data [here at link]( https://javl.github.io/image2cpp/) 
+Bitmaps can be turned to data [here at link](https://github.com/gavinlyonsrepo/Guardian_LTSM) 
 See example file "BITMAP" for more details.
 
 ## Output

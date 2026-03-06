@@ -1,7 +1,7 @@
 /*!
 * @file SSD1306_OLED_RPI/examples/include/Bitmap_test_data.hpp
 * @brief SSD1306_OLED_RPI Data file to hold bitmap test data, all horizontally addressed.
-* @details SW used to make code https://javl.github.io/image2cpp/ 
+* @details SW used to make code-> https://github.com/gavinlyonsrepo/Guardian_LTSM
 */
   
 #pragma once
