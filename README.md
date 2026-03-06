@@ -44,6 +44,11 @@
 	4. kernel : aarch64 Linux 6.1.0-rpi7-rpi-v8
 	5. [bcm2835 Library 1.74 dependency](http://www.airspayce.com/mikem/bcm2835/). Provides low level I2C bus, delays and GPIO control.
 
+## See Also
+
+The SSD1306_OLED_RPI library has been amalgamated into my combined display library ['Display_Lib_RPI.'](https://github.com/gavinlyonsrepo/Display_Lib_RPI)
+This new library is under active development and should work on any Linux based single board computer.
+
 
 ## Installation
 
@@ -197,7 +202,3 @@ variables in examples files.
 | 128x32 | Yes | Yes |
 | ???x16 | Yes | NO |
 
-
-## See Also
-
-[Combined Display library 'Display_Lib_RPI'](https://github.com/gavinlyonsrepo/Display_Lib_RPI)
